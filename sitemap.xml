@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://knaansh.github.io/</loc>
+    <lastmod>2026-03-04</lastmod>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://knaansh.github.io/live.html</loc>
+    <lastmod>2026-03-04</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://knaansh.github.io/videos.html</loc>
+    <lastmod>2026-03-04</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://knaansh.github.io/music.html</loc>
+    <lastmod>2026-03-04</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://knaansh.github.io/contact.html</loc>
+    <lastmod>2026-03-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://knaansh.github.io/shop.html</loc>
+    <lastmod>2026-03-04</lastmod>
+    <priority>0.5</priority>
+  </url>
+</urlset>
