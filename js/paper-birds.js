@@ -83,10 +83,13 @@
   });
 
   /* ---------- records: open one off the shelf ---------- */
+  // A url() inside a CSS variable resolves against the stylesheet (css/), so hand the label an absolute URL.
+  const abs = src => new URL(src, location.href).href;
+  document.querySelectorAll('.rec').forEach(r => r.style.setProperty('--lbl', `url("${abs(r.querySelector('img').getAttribute('src'))}")`));
   const opened = document.getElementById('opened');
   function openRecord(btn, scroll){
     const d = btn.dataset, img = btn.querySelector('img').getAttribute('src');
-    opened.style.setProperty('--lbl', `url('${img}')`);
+    opened.style.setProperty('--lbl', `url("${abs(img)}")`);
     opened.innerHTML = `
       <div class="turntable"><div class="big-sleeve"><img src="${img}" alt="${esc(d.title)} cover"></div><div class="big-disc"><span class="label"></span></div></div>
       <div class="notes">
