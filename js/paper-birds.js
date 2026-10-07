@@ -56,10 +56,11 @@
     const vh = innerHeight, y = scrollY;
     if (birds.length) {
       const p = Math.min(1, y / (vh * .7));
+      const drift = innerWidth < 820 ? .35 : 1; // birds drift less on phones so they don't overlap
       birds.forEach((b, i) => {
         const local = Math.max(0, Math.min(1, p * 1.6 - i * .2 + .25)); // the first bird starts part-colored
         b.querySelector('.color').style.setProperty('--p', (local * 100).toFixed(1) + '%');
-        b.style.translate = `${(p * 30 * (i + 1)).toFixed(1)}px ${(-p * 40 * (i + 1)).toFixed(1)}px`;
+        b.style.translate = `${(p * 30 * drift * (i + 1)).toFixed(1)}px ${(-p * 40 * drift * (i + 1)).toFixed(1)}px`;
       });
     }
     sheets.forEach(s => {
