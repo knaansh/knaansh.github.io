@@ -175,15 +175,15 @@ html.fold-in .fold i{transform:rotateX(0);transition:none}
 /* the opened record */
 .opened{display:none;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:start;margin-bottom:clamp(48px,8vh,96px);scroll-margin-top:110px}
 .opened.on{display:grid}
-.turntable{position:relative;aspect-ratio:1.67;max-width:100%}
-.turntable .big-sleeve{position:absolute;left:0;top:0;width:58%;aspect-ratio:1;z-index:2;box-shadow:0 30px 50px -25px rgba(20,20,20,.55);animation:slideIn .6s cubic-bezier(.2,.7,.2,1) both}
+/* sleeve 64% wide; the record is a little smaller than the sleeve and ends half out of it */
+.turntable{position:relative;aspect-ratio:1.56;max-width:100%}
+.turntable .big-sleeve{position:absolute;left:0;top:0;width:64%;aspect-ratio:1;z-index:2;box-shadow:0 1px 2px rgba(20,20,20,.12),0 6px 14px -8px rgba(20,20,20,.25)}
 .turntable .big-sleeve img{width:100%;height:100%;object-fit:cover}
-.turntable .big-disc{position:absolute;right:0;top:2%;width:60%;aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle,#141414 0 2px,#262626 2px 3px);animation:discOut .8s .15s cubic-bezier(.2,.7,.2,1) both}
+.turntable .big-disc{position:absolute;left:34.5%;top:3.9%;width:59%;aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle,#141414 0 2px,#262626 2px 3px);animation:discOut .9s .1s cubic-bezier(.25,.8,.25,1) both}
 .turntable .big-disc::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 40deg,transparent 0 20%,rgba(255,255,255,.08) 25%,transparent 32% 70%,rgba(255,255,255,.06) 75%,transparent 80%)}
 .turntable .big-disc .label{position:absolute;inset:31%;border-radius:50%;background:var(--lbl) center/cover;box-shadow:0 0 0 3px #111,inset 0 0 0 1px rgba(255,255,255,.15);animation:spin 7s linear infinite}
 .turntable .big-disc .label::after{content:"";position:absolute;inset:46%;border-radius:50%;background:var(--paper)}
-@keyframes slideIn{from{transform:translateX(18%)}to{transform:none}}
-@keyframes discOut{from{transform:translateX(-40%) rotate(-40deg)}to{transform:none}}
+@keyframes discOut{from{transform:translateX(-50%) rotate(-30deg)}to{transform:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .notes{display:grid;gap:1.1rem;min-width:0}
 .notes h2{font-weight:300;font-size:clamp(1.8rem,3.6vw,2.8rem);line-height:1.05;letter-spacing:.03em;text-transform:uppercase;text-wrap:balance}
