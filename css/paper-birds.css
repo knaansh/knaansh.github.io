@@ -117,7 +117,7 @@ html.fold-in .fold i{transform:rotateX(0);transition:none}
 
 /* page heads (inner pages) */
 .page-head{padding:150px 0 clamp(32px,6vh,64px)}
-.page-head .title{font-size:clamp(2.6rem,8vw,6rem);margin-top:.6rem}
+.page-head .title{font-size:clamp(2.6rem,8vw,6rem)}
 .page-head p{margin-top:1rem;max-width:56ch;color:var(--muted)}
 .night .page-head p{color:var(--nmuted)}
 @media (max-width:820px){.page-head{padding-top:110px}}
