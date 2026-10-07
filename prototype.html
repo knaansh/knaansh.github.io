@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Paper Birds Prototype</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: paper sheets that unfold on scroll; one persistent player bar; views swap with a paper fold. */
+:root{
+  --paper:#fbf9f4; --paper-2:#f1ede4; --ink:#141414; --muted:#6f6b64;
+  --night:#0c0c0e; --nfg:#efece6; --sky:#4f7ea6; --rose:#c98a8f; --mint:#3f8a6b;
+  --crease:rgba(20,20,20,.08); --line:rgba(20,20,20,.12);
+  --display:'Inter',system-ui,sans-serif; --serif:'Instrument Serif',Georgia,serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --bar-h:64px;
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font:300 16px/1.6 var(--display);-webkit-font-smoothing:antialiased;padding-bottom:calc(var(--bar-h) + env(safe-area-inset-bottom,0px))}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img{display:block;max-width:100%}
+:focus-visible{outline:2px solid var(--sky);outline-offset:3px}
+.eyebrow{font:500 11px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.title{font-weight:300;font-size:clamp(2rem,5vw,3.6rem);letter-spacing:.05em;text-transform:uppercase;line-height:1.02;text-wrap:balance}
+.btn{display:inline-flex;align-items:center;gap:.6rem;padding:.8rem 1.3rem;font:500 11px/1 var(--display);letter-spacing:.2em;text-transform:uppercase;border:1.5px solid currentColor;transition:background .2s,color .2s}
+.btn:hover{background:var(--ink);color:var(--paper)}
+
+/* proto ribbon */
+.proto{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 58px);transform:translateX(-50%);z-index:70;font:500 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;background:var(--ink);color:var(--paper);padding:.45rem .7rem;white-space:nowrap}
+
+/* nav: always visible, four items */
+.nav{position:fixed;inset:0 0 auto 0;z-index:60;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;padding:calc(env(safe-area-inset-top,0px) + 16px) clamp(16px,4vw,48px) 14px;background:linear-gradient(var(--paper) 55%,rgba(251,249,244,0))}
+.nav .mark{font:400 1.35rem/1 var(--serif);font-style:italic;letter-spacing:.01em}
+.nav .links{display:flex;gap:clamp(.9rem,2vw,1.6rem);font:500 11px/1 var(--display);letter-spacing:.2em;text-transform:uppercase}
+.nav .links a{opacity:.6;padding:.4rem 0;position:relative;transition:opacity .2s}
+.nav .links a:hover,.nav .links a[aria-current="page"]{opacity:1}
+.nav .links a[aria-current="page"]::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:1.5px;background:currentColor}
+.nav .side{justify-self:end;font:500 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:720px){
+  .nav{grid-template-columns:1fr;justify-items:center;gap:.7rem;padding-top:calc(env(safe-area-inset-top,0px) + 12px)}
+  .nav .side{display:none}
+  .proto{top:calc(env(safe-area-inset-top,0px) + 82px)}
+}
+
+/* views */
+main{min-height:100vh;overflow-x:clip}
+.view{display:none}
+.view.on{display:block}
+.wrap{max-width:1140px;margin:0 auto;padding-inline:clamp(16px,6vw,72px)}
+
+/* fold transition: two paper halves close over the screen and open again */
+.fold{position:fixed;inset:0;z-index:80;pointer-events:none;perspective:1400px;display:none;overflow:hidden}
+.fold.active{display:block}
+.fold i{position:absolute;left:0;right:0;height:50%;background:var(--paper-2);transform-style:preserve-3d;transition:transform .42s cubic-bezier(.6,0,.3,1);box-shadow:0 0 0 1px var(--line)}
+.fold i:first-child{top:0;transform-origin:top;transform:rotateX(-92deg);background:linear-gradient(var(--paper-2),#e8e3d8)}
+.fold i:last-child{bottom:0;transform-origin:bottom;transform:rotateX(92deg);background:linear-gradient(#e2dccf,var(--paper-2))}
+.fold.closed i{transform:rotateX(0)}
+.fold .crease{position:absolute;left:0;right:0;top:50%;height:1px;background:var(--crease);opacity:0;transition:opacity .2s}
+.fold.closed .crease{opacity:1}
+
+/* ===== HOME ===== */
+.hero{position:relative;min-height:min(92vh,860px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:end;gap:2rem;padding:140px clamp(16px,6vw,72px) 9vh;overflow:hidden}
+.hero h1{font-weight:300;font-size:clamp(2.4rem,6.2vw,5.4rem);line-height:.98;letter-spacing:.03em;text-transform:uppercase;text-wrap:balance}
+.hero .who{margin-top:1rem;font:700 clamp(.9rem,1.5vw,1.15rem)/1 var(--display);letter-spacing:.26em;text-transform:uppercase}
+.hero .tag{margin-top:1.4rem;font:italic 400 1.35rem/1.3 var(--serif);color:var(--muted)}
+.hero .ctas{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:2rem}
+.flight{position:relative;align-self:stretch;min-height:420px}
+.bird{position:absolute;width:var(--s);aspect-ratio:1;left:var(--x);top:var(--y);transform:rotate(var(--r))}
+.bird img{position:absolute;inset:0;width:100%;height:100%}
+.bird .color{clip-path:inset(calc(100% - var(--p,0%)) 0 0 0);transition:clip-path .15s linear}
+.bird:nth-child(1){--s:22%;--x:2%;--y:68%;--r:-4deg}
+.bird:nth-child(2){--s:28%;--x:24%;--y:44%;--r:-2deg}
+.bird:nth-child(3){--s:34%;--x:46%;--y:20%;--r:0deg}
+.bird:nth-child(4){--s:40%;--x:62%;--y:-6%;--r:3deg}
+.hint{position:absolute;right:clamp(16px,6vw,72px);bottom:4vh;font:500 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:820px){
+  .hero{grid-template-columns:1fr;padding-top:150px}
+  .flight{order:-1;min-height:300px}
+  .hint{display:none}
+}
+
+/* sheets that unfold */
+.sheet{position:relative;transform-origin:top center;transform:perspective(1600px) rotateX(calc(var(--u,0) * 14deg));transition:transform .1s linear}
+.sheet::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(rgba(0,0,0,calc(var(--u,0) * .10)),transparent 60%);z-index:2}
+.sheet::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--line)}
+.sec{padding-block:clamp(64px,10vh,120px)}
+.sec-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:2.2rem}
+.sec-head .title{color:var(--c,var(--ink))}
+
+/* live / bandsintown */
+.stage{position:relative;overflow:hidden}
+.stage .wash{position:absolute;inset:0;background-size:cover;background-position:center 30%;filter:grayscale(1) contrast(.9);opacity:.16}
+.stage .wrap{position:relative}
+.setlist{position:relative;background:var(--paper);border:1px solid var(--line);box-shadow:0 30px 60px -30px rgba(20,20,20,.35);padding:clamp(20px,3vw,40px);max-width:860px}
+.setlist .tape{position:absolute;width:92px;height:26px;background:rgba(214,206,186,.75);top:-12px}
+.setlist .tape.l{left:28px;transform:rotate(-4deg)}
+.setlist .tape.r{right:28px;transform:rotate(5deg)}
+.setlist-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.6rem;padding-bottom:1rem;margin-bottom:1rem;border-bottom:1px solid var(--line)}
+.bit-empty{display:grid;gap:.6rem;padding-block:2rem;text-align:left}
+.bit-empty strong{font:400 1.8rem/1.1 var(--serif);font-style:italic;font-weight:400}
+.bit-empty p{color:var(--muted);max-width:52ch}
+
+/* videos */
+.night{background:var(--night);color:var(--nfg)}
+.night .eyebrow{color:#9a958c}
+.night .btn:hover{background:var(--nfg);color:var(--night)}
+.vgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,2vw,24px)}
+.vgrid.big{grid-template-columns:repeat(2,minmax(0,1fr))}
+.vgrid .feat{grid-column:1/-1}
+.vid{display:grid;gap:.7rem}
+.vid .thumb{position:relative;aspect-ratio:16/9;overflow:hidden;background:#1a1a1d}
+.vid .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.7,.2,1),filter .4s;filter:saturate(.85)}
+.vid:hover .thumb img{transform:scale(1.04);filter:saturate(1)}
+.vid .play{position:absolute;left:16px;bottom:16px;width:44px;height:44px;border:1.5px solid currentColor;border-radius:50%;display:grid;place-items:center;color:#fff}
+.vid .play::before{content:"";border-left:11px solid currentColor;border-top:7px solid transparent;border-bottom:7px solid transparent;margin-left:3px}
+.vid span{font:500 11px/1.4 var(--display);letter-spacing:.16em;text-transform:uppercase;opacity:.75}
+@media (max-width:720px){.vgrid,.vgrid.big{grid-template-columns:1fr}}
+
+/* ===== SHELF ===== */
+.shelf{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(10px,1.6vw,22px);align-items:end;padding-bottom:22px;border-bottom:10px solid var(--paper-2);box-shadow:0 1px 0 var(--line)}
+.shelf.compact{grid-template-columns:repeat(6,minmax(0,1fr))}
+.rec{position:relative;display:grid;gap:.7rem;text-align:left;perspective:900px}
+.rec .sleeve{position:relative;aspect-ratio:1;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1),box-shadow .5s;box-shadow:0 14px 24px -16px rgba(20,20,20,.5);background:var(--paper-2)}
+.rec .sleeve img{width:100%;height:100%;object-fit:cover}
+.rec .disc{position:absolute;inset:4%;border-radius:50%;background:repeating-radial-gradient(circle,#161616 0 2px,#222 2px 3px);transform:translateX(0);transition:transform .5s cubic-bezier(.2,.7,.2,1);z-index:-1}
+.rec .disc::after{content:"";position:absolute;inset:34%;border-radius:50%;background:var(--lbl) center/cover}
+.rec:hover .sleeve,.rec:focus-visible .sleeve{transform:rotateY(-14deg) rotateX(4deg) translateY(-6px);box-shadow:18px 24px 30px -18px rgba(20,20,20,.55)}
+.rec:hover .disc,.rec:focus-visible .disc{transform:translateX(28%)}
+.rec .meta{display:grid;gap:.15rem}
+.rec .meta b{font-weight:400;font-size:.95rem;line-height:1.3}
+.rec .meta small{font:500 10px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:900px){.shelf,.shelf.compact{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:2rem}}
+@media (max-width:480px){.shelf,.shelf.compact{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* open record */
+.opened{display:none;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:center;margin-bottom:clamp(48px,8vh,96px)}
+.opened.on{display:grid}
+.turntable{position:relative;aspect-ratio:1.45;max-width:100%}
+.turntable .big-sleeve{position:absolute;left:0;top:0;width:69%;aspect-ratio:1;z-index:2;box-shadow:0 30px 50px -25px rgba(20,20,20,.55);animation:slideIn .6s cubic-bezier(.2,.7,.2,1) both}
+.turntable .big-sleeve img{width:100%;height:100%;object-fit:cover}
+.turntable .big-disc{position:absolute;right:0;top:3%;width:64%;aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle,#141414 0 2px,#262626 2px 3px);animation:discOut .8s .15s cubic-bezier(.2,.7,.2,1) both}
+.turntable .big-disc::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 40deg,transparent 0 20%,rgba(255,255,255,.08) 25%,transparent 32% 70%,rgba(255,255,255,.06) 75%,transparent 80%)}
+.turntable .big-disc .label{position:absolute;inset:33%;border-radius:50%;background:var(--lbl) center/cover;animation:spin 6s linear infinite;animation-play-state:var(--spin,paused)}
+.turntable .big-disc .label::after{content:"";position:absolute;inset:46%;border-radius:50%;background:var(--paper)}
+@keyframes slideIn{from{transform:translateX(18%)}to{transform:none}}
+@keyframes discOut{from{transform:translateX(-40%) rotate(-40deg)}to{transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.notes{display:grid;gap:1.1rem;min-width:0}
+.notes h2{font-weight:300;font-size:clamp(1.8rem,3.6vw,2.8rem);line-height:1.05;letter-spacing:.03em;text-transform:uppercase;text-wrap:balance}
+.notes .liner{font:italic 400 1.3rem/1.4 var(--serif);color:var(--ink);max-width:46ch}
+.notes .liner.todo{color:var(--muted);border-left:2px dashed var(--line);padding-left:1rem}
+.notes .row{display:flex;flex-wrap:wrap;gap:.6rem}
+.notes .links a{font:500 11px/1 var(--display);letter-spacing:.18em;text-transform:uppercase;border-bottom:1.5px solid var(--mint);padding-bottom:.35rem;margin-right:1.1rem}
+.notes .close{justify-self:start;font:500 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:820px){.opened{grid-template-columns:1fr}}
+
+/* pages */
+.page-head{padding:150px 0 clamp(32px,6vh,64px)}
+.page-head .title{font-size:clamp(2.6rem,8vw,6rem)}
+.page-head p{margin-top:1rem;max-width:56ch;color:var(--muted)}
+.contact-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:start;padding-bottom:96px}
+.contact-grid img{aspect-ratio:4/5;object-fit:cover;width:100%;filter:grayscale(.2)}
+.mail{font:400 clamp(1.4rem,3vw,2.2rem)/1.2 var(--serif);font-style:italic;word-break:break-word;user-select:all}
+.socials{display:flex;flex-wrap:wrap;gap:.6rem 1.4rem;margin-top:2rem}
+.socials a{font:500 11px/1 var(--display);letter-spacing:.18em;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:.35rem}
+@media (max-width:720px){.contact-grid{grid-template-columns:1fr}}
+
+/* ===== PLAYER BAR (persists across views) ===== */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:65;background:var(--ink);color:var(--nfg);padding:10px clamp(16px,4vw,48px) calc(10px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;min-height:var(--bar-h)}
+.bar .cov{width:44px;height:44px;object-fit:cover}
+.bar .np{min-width:0;display:grid;gap:2px}
+.bar .np small{font:500 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:#9a958c}
+.bar .np b{font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .ctrl{display:flex;align-items:center;gap:12px}
+.bar .pp{width:40px;height:40px;border-radius:50%;border:1.5px solid currentColor;display:grid;place-items:center}
+.bar .pp::before{content:"";border-left:11px solid currentColor;border-top:7px solid transparent;border-bottom:7px solid transparent;margin-left:3px}
+.bar.playing .pp::before{border:0;width:12px;height:14px;margin:0;background:linear-gradient(90deg,currentColor 0 35%,transparent 35% 65%,currentColor 65%)}
+.eq{display:flex;gap:3px;align-items:end;height:16px}
+.eq i{width:3px;height:30%;background:var(--rose)}
+.bar.playing .eq i{animation:eq .9s ease-in-out infinite alternate}
+.eq i:nth-child(2){animation-delay:-.3s!important}.eq i:nth-child(3){animation-delay:-.6s!important}
+@keyframes eq{to{height:100%}}
+.bar .out{font:500 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#9a958c}
+.bar .embed{grid-column:1/-1;display:none}
+.bar.live .embed{display:block}
+.bar.live{grid-template-columns:minmax(0,1fr);padding-top:8px;gap:0}
+.bar.live .cov,.bar.live .np,.bar.live .ctrl{display:none}
+.bar.live .embed iframe{margin-top:0!important}
+@media (max-width:520px){.bar .out{display:none}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .sheet{transform:none}
+  .bird .color{clip-path:none}
+}
+</style>
+
+<div class="proto" role="note">Prototype · not the live site</div>
+
+<header class="nav">
+  <a class="mark" href="#home" data-go="home">Knaan Shabtay</a>
+  <nav class="links" aria-label="Main navigation">
+    <a href="#tour" data-go="tour">Tour</a>
+    <a href="#videos" data-go="videos">Videos</a>
+    <a href="#music" data-go="music">Music</a>
+    <a href="#contact" data-go="contact">Contact</a>
+  </nav>
+  <span class="side">Paper Birds · draft</span>
+</header>
+
+<div class="fold" aria-hidden="true"><i></i><span class="crease"></span><i></i></div>
+
+<main>
+<!-- ================= HOME ================= -->
+<section class="view" data-view="home">
+  <div class="hero">
+    <div>
+      <h1>Teaching paper birds to fly</h1>
+      <p class="who">Knaan Shabtay</p>
+      <p class="tag">Songs folded by hand, then let go.</p>
+      <div class="ctas">
+        <button class="btn" data-play="tpbtf">▶ Play the album</button>
+        <a class="btn" href="#tour" data-go="tour">Tour dates</a>
+      </div>
+    </div>
+    <div class="flight" aria-hidden="true">
+      <div class="bird"><img src="assets/images/hummingbird-line.png" alt=""><img class="color" src="assets/images/hummingbird.png" alt=""></div>
+      <div class="bird"><img src="assets/images/hummingbird-line.png" alt=""><img class="color" src="assets/images/hummingbird.png" alt=""></div>
+      <div class="bird"><img src="assets/images/hummingbird-line.png" alt=""><img class="color" src="assets/images/hummingbird.png" alt=""></div>
+      <div class="bird"><img src="assets/images/hummingbird-line.png" alt=""><img class="color" src="assets/images/hummingbird.png" alt=""></div>
+    </div>
+    <p class="hint">Scroll to colour them in ↓</p>
+  </div>
+
+  <section class="sheet stage sec" aria-labelledby="h-live">
+    <div class="wash" style="background-image:url('assets/images/drive-photos/barby-ADM1661-solo.jpg')"></div>
+    <div class="wrap">
+      <div class="sec-head"><h2 id="h-live" class="title" style="--c:var(--sky)">Live</h2><a class="btn" href="#tour" data-go="tour">See all dates</a></div>
+      <div class="setlist">
+        <span class="tape l"></span><span class="tape r"></span>
+        <div class="setlist-top"><span class="eyebrow">Tonight's setlist · Bandsintown</span><a class="eyebrow" href="https://www.bandsintown.com/a/2039791-knaan-shabtay" target="_blank" rel="noopener">Follow ↗</a></div>
+        <div class="bit-slot" data-bit></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet night sec" aria-labelledby="h-vid">
+    <div class="wrap">
+      <div class="sec-head"><h2 id="h-vid" class="title" style="--c:var(--rose)">Videos</h2><a class="btn" href="#videos" data-go="videos">See all videos</a></div>
+      <div class="vgrid big" data-videos="3"></div>
+    </div>
+  </section>
+
+  <section class="sheet sec" aria-labelledby="h-mus">
+    <div class="wrap">
+      <div class="sec-head"><h2 id="h-mus" class="title" style="--c:var(--mint)">Music</h2><a class="btn" href="#music" data-go="music">Open the shelf</a></div>
+      <div class="shelf compact" data-shelf></div>
+    </div>
+  </section>
+</section>
+
+<!-- ================= TOUR ================= -->
+<section class="view" data-view="tour">
+  <div class="stage">
+    <div class="wash" style="background-image:url('assets/images/drive-photos/barby-ADM1458.jpg')"></div>
+    <div class="wrap">
+      <div class="page-head"><p class="eyebrow">Tour</p><h1 class="title">Tour dates</h1></div>
+      <div class="setlist" style="margin-bottom:96px">
+        <span class="tape l"></span><span class="tape r"></span>
+        <div class="setlist-top"><span class="eyebrow">Upcoming · Bandsintown</span><a class="eyebrow" href="https://www.bandsintown.com/a/2039791-knaan-shabtay" target="_blank" rel="noopener">Follow ↗</a></div>
+        <div class="bit-slot" data-bit></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VIDEOS ================= -->
+<section class="view night" data-view="videos">
+  <div class="wrap">
+    <div class="page-head"><p class="eyebrow">Videos</p><h1 class="title">Videos</h1></div>
+    <div class="vgrid" data-videos="all" style="padding-bottom:96px"></div>
+  </div>
+</section>
+
+<!-- ================= MUSIC ================= -->
+<section class="view" data-view="music">
+  <div class="wrap">
+    <div class="page-head"><p class="eyebrow">Music</p><h1 class="title">Discography</h1><p>Pull a record off the shelf. Press play and it keeps going while you look around the rest of the site.</p></div>
+    <div class="opened" id="opened" aria-live="polite"></div>
+    <div class="shelf" data-shelf style="margin-bottom:96px"></div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="view" data-view="contact">
+  <div class="wrap">
+    <div class="page-head"><p class="eyebrow">Contact</p><h1 class="title">Contact</h1></div>
+    <div class="contact-grid">
+      <div>
+        <p class="eyebrow">Management &amp; Booking</p>
+        <p class="mail" style="margin-top:.8rem">knaanshabtaymusic@gmail.com</p>
+        <div class="row" style="display:flex;gap:.6rem;margin-top:1.4rem;flex-wrap:wrap">
+          <button class="btn" id="copy">Copy email</button>
+        </div>
+        <div class="socials">
+          <a href="https://open.spotify.com/artist/2lmk0RtmkwgqdylSRGUCuy" target="_blank" rel="noopener">Spotify</a>
+          <a href="https://music.apple.com/il/artist/knaan-shabtay/950357713" target="_blank" rel="noopener">Apple Music</a>
+          <a href="https://www.youtube.com/@KnaanShabtay" target="_blank" rel="noopener">YouTube</a>
+          <a href="https://www.instagram.com/knaanshabtay/" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://www.tiktok.com/@knaanshabtay" target="_blank" rel="noopener">TikTok</a>
+          <a href="https://www.facebook.com/knaanshabtaymusic" target="_blank" rel="noopener">Facebook</a>
+        </div>
+      </div>
+      <img src="assets/images/drive-photos/malabia-DSC1221.jpg" alt="Knaan Shabtay performing" loading="lazy">
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- persistent player -->
+<div class="bar" id="bar" role="region" aria-label="Now playing">
+  <img class="cov" id="bar-cov" src="assets/images/album-tpbtf.png" alt="">
+  <div class="np"><small id="bar-state">Ready to play</small><b id="bar-title">Teaching Paper Birds To Fly</b></div>
+  <div class="ctrl">
+    <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
+    <a class="out" id="bar-out" href="https://open.spotify.com/album/74B7WurXoJ1MMDn0ZmAo7s" target="_blank" rel="noopener">Spotify ↗</a>
+    <button class="pp" id="pp" aria-label="Play"></button>
+  </div>
+  <div class="embed" id="bar-embed"></div>
+</div>
+
+<script>
+// Real site: widgets load. Inside the Claude preview frame they're blocked, so show stand-ins.
+const LIVE = window.self === window.top;
+
+const RECORDS = [
+  {id:'tpbtf', title:'Teaching Paper Birds To Fly', kind:'Album', year:'2023', img:'album-tpbtf.png', sp:'74B7WurXoJ1MMDn0ZmAo7s',
+   am:'https://music.apple.com/il/album/teaching-paper-birds-to-fly/1655574635', yt:'https://music.youtube.com/playlist?list=PLCCNsoUHoq4o5NijZ62lfa7pSjsUgwJgP', note:''},
+  {id:'ffh', title:'Far From Home', kind:'EP', year:'2018', img:'album-ffh.png', sp:'16BuRoF70WWl1MF4a8XRHp',
+   am:'https://music.apple.com/il/album/far-from-home-ep/1438834858', yt:'https://music.youtube.com/playlist?list=OLAK5uy_m-f19RqgK8dIMIciOLWZmaoUWYd4WJwZE', note:''},
+  {id:'1999', title:'1999', kind:'Single', year:'', img:'album-1999.png', sp:'4MzitlFYPf79nKNswO7tZg',
+   am:'https://music.apple.com/il/album/1999-single/1488921222', yt:'https://music.youtube.com/watch?v=iAaRA5j4s1g', note:''},
+  {id:'ywsif', title:"You Won't Say It First", kind:'Single', year:'', img:'album-you-wont-say-it-first.png', sp:'1JE4gziBlj4gfkQ1RJfzJh',
+   am:'https://music.apple.com/zm/song/you-wont-say-it-first/1462421587', yt:'https://music.youtube.com/watch?v=Sw6MtUzulzc', note:''},
+  {id:'anfos', title:'A Night Full Of Stars', kind:'Live EP', year:'', img:'album-night-full-of-stars.png', sp:'2XNUBpDgehvlBzUOSKpUVE',
+   am:'https://music.apple.com/il/album/a-night-full-of-stars-live-ep/1454276522', yt:'https://music.youtube.com/playlist?list=OLAK5uy_mfSeTYdqi3SfT1C-vZpZGgWwDKrG9AHpI', note:''},
+  {id:'lit', title:'Lost In Time', kind:'EP', year:'2014', img:'album-lost-in-time.png', sp:'2mRCZZTFrL7EN4Kvm7EJyk',
+   am:'https://music.apple.com/il/album/lost-in-time-ep/950357700', yt:'https://music.youtube.com/playlist?list=OLAK5uy_moBJATOf3xelXRrgC7LJuLnm-LRJUyrZc',
+   note:'Self-released in November 2014. The single Stay A Little Longer reached radio in Switzerland and beyond in early 2015.'},
+];
+const VIDEOS = [
+  ['wY_Nl4oxWm8','The Morning Papers','yt-wY_Nl4oxWm8.jpg'],
+  ['DsjrlqTeLkU',"You Won't Say It First",'yt-DsjrlqTeLkU.jpg'],
+  ['rWR6Qf7z964','Teaching Paper Birds To Fly','yt-rWR6Qf7z964.jpg'],
+  ['Aynt3WShcuI','A Night Full Of Stars (Live)','drive-photos/barby-ADM1430.jpg'],
+  ['IbCsw6QKSGc','My Quiet Place Under The Sun (Live)','drive-photos/lev-lev4.jpg'],
+  ['IsUUwdtDjZA','Stay For The Night (Live)','drive-photos/barby-ADM1458.jpg'],
+  ['CnSLCvRPO8M','Stay A Little Longer (Live Session)','drive-photos/malabia-DSC1221.jpg'],
+  ['sVB3mFmFcq8','Sunrise (Live Session)','drive-photos/barby-ADM1661-solo.jpg'],
+];
+const IMG = p => 'assets/images/' + p;
+const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- shelf ---------- */
+function recHTML(r){
+  return `<button class="rec" data-open="${r.id}" style="--lbl:url('${IMG(r.img)}')" aria-label="Open ${esc(r.title)}">
+    <span class="sleeve"><span class="disc"></span><img src="${IMG(r.img)}" alt="" loading="lazy"></span>
+    <span class="meta"><b>${esc(r.title)}</b><small>${r.kind}${r.year ? ' · ' + r.year : ''}</small></span></button>`;
+}
+document.querySelectorAll('[data-shelf]').forEach(el => el.innerHTML = RECORDS.map(recHTML).join(''));
+
+function openRecord(id){
+  const r = RECORDS.find(x => x.id === id); if(!r) return;
+  const box = document.getElementById('opened');
+  box.style.setProperty('--lbl', `url('${IMG(r.img)}')`);
+  box.innerHTML = `
+    <div class="turntable"><div class="big-sleeve"><img src="${IMG(r.img)}" alt="${esc(r.title)} cover"></div>
+      <div class="big-disc"><span class="label"></span></div></div>
+    <div class="notes">
+      <p class="eyebrow">${r.kind}${r.year ? ' · ' + r.year : ''}</p>
+      <h2>${esc(r.title)}</h2>
+      ${r.note ? `<p class="liner">${esc(r.note)}</p>` : `<p class="liner todo">Liner note goes here: a few lines on where this record came from.</p>`}
+      <div class="row"><button class="btn" data-play="${r.id}">▶ Play in the bar</button></div>
+      <div class="links"><a href="https://open.spotify.com/album/${r.sp}" target="_blank" rel="noopener">Spotify</a><a href="${r.am}" target="_blank" rel="noopener">Apple Music</a><a href="${r.yt}" target="_blank" rel="noopener">YouTube Music</a></div>
+      <button class="close" data-close>← Back on the shelf</button>
+    </div>`;
+  box.classList.add('on');
+  syncSpin();
+  box.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'center'});
+}
+
+/* ---------- videos ---------- */
+document.querySelectorAll('[data-videos]').forEach(el => {
+  const n = el.dataset.videos === 'all' ? VIDEOS.length : +el.dataset.videos;
+  el.innerHTML = VIDEOS.slice(0, n).map(([id,t,fallback], i) => {
+    const src = LIVE ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : IMG(fallback);
+    return `<a class="vid${i===0?' feat':''}" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">
+      <span class="thumb"><img src="${src}" onerror="this.onerror=null;this.src='${IMG(fallback)}'" alt="" loading="lazy"><span class="play"></span></span>
+      <span>${esc(t)}</span></a>`;
+  }).join('');
+});
+
+/* ---------- bandsintown ---------- */
+const BIT_ATTRS = {
+  'data-artist-name':'id_2039791','data-app-id':'c506b1d08fc276d96da2c4661d702c5e',
+  'data-background-color':'rgba(251,249,244,1)','data-separator-color':'rgba(20,20,20,0.12)','data-text-color':'rgba(20,20,20,1)',
+  'data-display-local-dates':'true','data-local-dates-position':'tab','data-display-past-dates':'false','data-display-details':'false',
+  'data-display-lineup':'false','data-display-start-time':'true','data-social-share-icon':'false','data-display-limit':'10',
+  'data-date-format':'MMM. D, YYYY','data-date-orientation':'horizontal','data-event-ticket-text':'TICKETS','data-event-ticket-icon':'false',
+  'data-event-ticket-cta-size':'large','data-event-ticket-cta-text-color':'rgba(79,126,166,1)','data-event-ticket-cta-bg-color':'rgba(255,255,255,0)',
+  'data-event-ticket-cta-border-color':'rgba(79,126,166,1)','data-event-ticket-cta-border-width':'2px','data-event-ticket-cta-border-radius':'0px',
+  'data-event-rsvp-position':'hidden','data-follow-section-position':'bottom','data-follow-section-cta-text':'FOLLOW',
+  'data-follow-section-cta-text-color':'rgba(79,126,166,1)','data-follow-section-cta-bg-color':'rgba(0,0,0,0)',
+  'data-follow-section-cta-border-color':'rgba(79,126,166,1)','data-follow-section-cta-border-width':'2px','data-follow-section-cta-border-radius':'0px',
+  'data-play-my-city-position':'hidden','data-language':'en','data-bit-logo-position':'hidden'
+};
+const bitSlots = [...document.querySelectorAll('[data-bit]')];
+if (LIVE) {
+  bitSlots.forEach(slot => {
+    const a = document.createElement('a'); a.className = 'bit-widget-initializer';
+    for (const [k,v] of Object.entries(BIT_ATTRS)) a.setAttribute(k, v);
+    slot.appendChild(a);
+  });
+  const s = document.createElement('script'); s.charset = 'utf-8'; s.src = 'https://widgetv3.bandsintown.com/main.min.js';
+  document.body.appendChild(s);
+} else {
+  bitSlots.forEach(slot => slot.innerHTML = `<div class="bit-empty"><strong>Your Bandsintown dates load here.</strong>
+    <p>On the real site this is the live Bandsintown widget, restyled to sit on the taped-down setlist. The preview frame blocks outside widgets, so this is a stand-in.</p></div>`);
+}
+
+/* ---------- player bar ---------- */
+const bar = document.getElementById('bar');
+let current = RECORDS[0], playing = false;
+function setRecord(r, autoplay){
+  current = r;
+  document.getElementById('bar-cov').src = IMG(r.img);
+  document.getElementById('bar-title').textContent = r.title;
+  document.getElementById('bar-out').href = 'https://open.spotify.com/album/' + r.sp;
+  if (LIVE) {
+    bar.classList.add('live');
+    document.getElementById('bar-embed').innerHTML = `<iframe title="${esc(r.title)} on Spotify" src="https://open.spotify.com/embed/album/${r.sp}?utm_source=generator&theme=0" width="100%" height="80" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" style="border-radius:8px;display:block;margin-top:6px"></iframe>`;
+    document.body.style.setProperty('--bar-h','96px');
+    document.getElementById('bar-state').textContent = 'Now playing · press play in the player';
+  } else {
+    playing = autoplay ?? playing; paint();
+  }
+}
+function paint(){
+  bar.classList.toggle('playing', playing);
+  document.getElementById('pp').setAttribute('aria-label', playing ? 'Pause' : 'Play');
+  document.getElementById('bar-state').textContent = playing ? 'Now playing · preview' : 'Paused';
+  syncSpin();
+}
+function syncSpin(){ document.getElementById('opened').style.setProperty('--spin', (playing && document.querySelector('.turntable')) ? 'running' : 'paused'); }
+document.getElementById('pp').addEventListener('click', () => { playing = !playing; paint(); });
+
+/* ---------- routing with paper fold ---------- */
+const fold = document.querySelector('.fold');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+let view = null;
+function show(name, animate){
+  if (!document.querySelector(`[data-view="${name}"]`)) name = 'home';
+  if (name === view) { window.scrollTo({top:0, behavior:'smooth'}); return; }
+  const swap = () => {
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.dataset.view === name));
+    document.querySelectorAll('.nav .links a').forEach(a => a.dataset.go === name ? a.setAttribute('aria-current','page') : a.removeAttribute('aria-current'));
+    window.scrollTo(0,0); view = name; onScroll();
+  };
+  if (!animate || reduce.matches) return swap();
+  fold.classList.add('active');
+  requestAnimationFrame(() => requestAnimationFrame(() => fold.classList.add('closed')));
+  setTimeout(() => { swap(); fold.classList.remove('closed'); setTimeout(() => fold.classList.remove('active'), 450); }, 460);
+}
+document.addEventListener('click', e => {
+  const go = e.target.closest('[data-go]');
+  if (go) { e.preventDefault(); history.replaceState(null,'','#'+go.dataset.go); show(go.dataset.go, true); return; }
+  const op = e.target.closest('[data-open]');
+  if (op) { if (view !== 'music') { history.replaceState(null,'','#music'); show('music', true); setTimeout(() => openRecord(op.dataset.open), 480); } else openRecord(op.dataset.open); return; }
+  const pl = e.target.closest('[data-play]');
+  if (pl) { setRecord(RECORDS.find(r => r.id === pl.dataset.play), true); return; }
+  if (e.target.closest('[data-close]')) { document.getElementById('opened').classList.remove('on'); return; }
+});
+document.getElementById('copy').addEventListener('click', async e => {
+  try { await navigator.clipboard.writeText('knaanshabtaymusic@gmail.com'); e.target.textContent = 'Copied'; }
+  catch { const r = document.createRange(); r.selectNodeContents(document.querySelector('.mail')); getSelection().removeAllRanges(); getSelection().addRange(r); e.target.textContent = 'Selected, press copy'; }
+});
+
+/* ---------- scroll: birds colour in, sheets unfold ---------- */
+const birds = [...document.querySelectorAll('.bird')];
+function onScroll(){
+  if (reduce.matches) return;
+  const vh = innerHeight, y = scrollY;
+  if (view === 'home') {
+    const p = Math.min(1, y / (vh * .7));
+    birds.forEach((b, i) => {
+      const local = Math.max(0, Math.min(1, p * 1.6 - i * .2 + .25)); // first bird starts part-coloured
+      b.querySelector('.color').style.setProperty('--p', (local * 100).toFixed(1) + '%');
+      b.style.translate = `${(p * 30 * (i + 1)).toFixed(1)}px ${(-p * 40 * (i + 1)).toFixed(1)}px`;
+    });
+  }
+  document.querySelectorAll('.view.on .sheet').forEach(s => {
+    const top = s.getBoundingClientRect().top;
+    const u = Math.max(0, Math.min(1, (top - vh * .45) / (vh * .55)));
+    s.style.setProperty('--u', u.toFixed(3));
+  });
+}
+addEventListener('scroll', () => requestAnimationFrame(onScroll), {passive:true});
+addEventListener('resize', onScroll);
+
+show((location.hash || '#home').slice(1), false);
+setRecord(RECORDS[0], false);
+</script>
