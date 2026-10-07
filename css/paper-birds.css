@@ -24,7 +24,8 @@ svg{display:block}
 .btn:hover{background:var(--ink);color:var(--paper)}
 .night .btn:hover{background:var(--nfg);color:var(--night)}
 .wrap{max-width:1140px;margin:0 auto;padding-inline:var(--gutter)}
-main{overflow-x:clip}
+main{overflow-x:clip;flex:1 0 auto}
+body{min-height:100vh;display:flex;flex-direction:column} /* short pages keep the footer at the bottom */
 
 /* ===== nav ===== */
 .nav{position:fixed;inset:0 0 auto 0;z-index:60;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;
@@ -216,6 +217,16 @@ html.fold-in .fold i{transform:rotateX(0);transition:none}
 .foot .logo img{filter:none;height:28px}
 .foot .socials svg{width:18px;height:18px}
 .foot small{display:block;max-width:1140px;margin:2rem auto 0;color:var(--nmuted);font:400 12px/1.4 var(--sans)}
+
+/* the companion bird */
+html.measuring .sheet{transform:none}
+.companion{position:absolute;left:0;top:0;z-index:50;width:var(--size,64px);height:var(--size,64px);pointer-events:none;will-change:transform}
+.companion .flap{position:absolute;inset:0;transform:scaleX(var(--flip,1)) rotate(var(--tilt,0deg));transition:transform .25s}
+.companion img{position:absolute;inset:0;width:100%;height:100%}
+.companion .color{clip-path:inset(calc(100% - var(--fill,15%)) 0 0 0);transition:clip-path .3s}
+.companion.on-dark .line{filter:invert(1)}
+.companion.flying .flap{animation:hover .22s ease-in-out infinite alternate}
+@keyframes hover{to{translate:0 -3px}}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}

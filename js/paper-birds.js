@@ -72,6 +72,86 @@
   addEventListener('resize', onScroll);
   onScroll();
 
+  /* ---------- the companion: one paper bird travels down the page ----------
+     It leaves the hero flock, perches on each section or page title, and lands by the footer logo,
+     gaining a little more color at every stop. */
+  if (!reduce) {
+    const comp = document.createElement('div');
+    comp.className = 'companion';
+    comp.setAttribute('aria-hidden', 'true');
+    comp.innerHTML = '<span class="flap"><img class="line" src="assets/images/hummingbird-line.png" alt=""><img class="color" src="assets/images/hummingbird.png" alt=""></span>';
+    document.body.appendChild(comp);
+    const nights = [...document.querySelectorAll('.night, .foot, .dark-page main')];
+    let W = [], size = 64, lastX = null, lastY = null;
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+    function measure(){
+      size = innerWidth < 820 ? 44 : 64;
+      comp.style.setProperty('--size', size + 'px');
+      const sx = scrollX, sy = scrollY, maxX = document.documentElement.clientWidth - size - 8;
+      W = [];
+      root.classList.add('measuring'); // flatten the folding sheets so positions are true
+      const lead = document.querySelector('.bird:nth-child(4)');
+      if (lead) { // start just beyond the last bird in the hero, ignoring its scroll drift
+        const r = lead.getBoundingClientRect();
+        const [tx, ty] = (lead.style.translate || '0px 0px').split(' ').map(parseFloat);
+        W.push({x: clamp(r.right - (tx || 0) + sx - size * .2, 8, maxX), y: r.top - (ty || 0) + sy + r.height * .55});
+      }
+      document.querySelectorAll('.sec-head .title, .page-head .title').forEach(t => {
+        const rg = document.createRange(); rg.selectNodeContents(t);
+        const r = rg.getClientRects()[0]; if (!r) return;
+        const fs = parseFloat(getComputedStyle(t).fontSize);
+        // sit on top of the last letter of the first line
+        W.push({x: clamp(r.right + sx - size * .62, 8, maxX), y: r.top + sy + fs * .14 - size * .86});
+      });
+      const logo = document.querySelector('.foot .logo img');
+      if (logo) { const r = logo.getBoundingClientRect(); W.push({x: clamp(r.right + sx + 10, 8, maxX), y: r.top + sy - size * .55}); }
+      root.classList.remove('measuring');
+      W.sort((a, b) => a.y - b.y);
+      place();
+    }
+
+    function place(){
+      if (W.length < 2) { comp.hidden = true; return; }
+      comp.hidden = false;
+      // the line the bird follows; it slides lower near the end so the bird can reach the footer
+      const end = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+      const L = scrollY + innerHeight * (.55 + .42 * Math.pow(clamp(scrollY / end, 0, 1), 4));
+      let k = 0;
+      while (k < W.length - 2 && L >= W[k + 1].y) k++;
+      const a = W[k], b = W[k + 1];
+      const u = clamp((L - a.y) / Math.max(1, b.y - a.y), 0, 1);
+      const e = ease(clamp((u - .3) / .7, 0, 1)); // perch for the first part of each stretch, then fly
+      const swoop = Math.sin(Math.PI * e) * (innerWidth < 820 ? 28 : 90);
+      const x = a.x + (b.x - a.x) * e + swoop, y = a.y + (b.y - a.y) * e;
+      const flying = e > 0 && e < 1;
+      let tilt = 0, flip = 1;
+      if (lastX !== null && flying) {
+        const dx = x - lastX, dy = y - lastY;
+        if (Math.abs(dx) > .5) flip = dx < 0 ? -1 : 1;
+        tilt = clamp(Math.atan2(dy, Math.abs(dx) + 20) * 57.3, -25, 35);
+      }
+      lastX = x; lastY = y;
+      comp.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+      comp.style.setProperty('--tilt', tilt.toFixed(1) + 'deg');
+      comp.style.setProperty('--flip', flip);
+      comp.classList.toggle('flying', flying);
+      const fill = clamp((k + (u >= 1 ? 1 : e)) / (W.length - 1), 0, 1);
+      comp.style.setProperty('--fill', (15 + fill * 85).toFixed(1) + '%');
+      // white ink when the bird is over a dark band
+      const vy = y - scrollY + size / 2;
+      comp.classList.toggle('on-dark', nights.some(n => { const r = n.getBoundingClientRect(); return vy > r.top && vy < r.bottom; }));
+    }
+
+    addEventListener('scroll', () => requestAnimationFrame(place), {passive: true});
+    addEventListener('resize', measure);
+    addEventListener('load', measure);
+    if (document.fonts) document.fonts.ready.then(measure);
+    new ResizeObserver(() => measure()).observe(document.body);
+    measure();
+  }
+
   /* ---------- Spotify players ---------- */
   function spotify(id, title, height){
     return EMBEDS
