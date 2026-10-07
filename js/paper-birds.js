@@ -37,13 +37,13 @@
   /* ---------- mobile menu ---------- */
   const menu = document.querySelector('.sheet-menu');
   const menuBtn = document.querySelector('.menu-btn');
-  function closeMenu(){ if (!menu) return; menu.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); menuBtn.textContent = 'Menu'; }
+  function closeMenu(){ if (!menu) return; menu.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); menuBtn.setAttribute('aria-label', 'Open menu'); }
   if (menu && menuBtn) {
     menuBtn.addEventListener('click', () => {
       const open = !menu.classList.contains('open');
       menu.classList.toggle('open', open);
       menuBtn.setAttribute('aria-expanded', String(open));
-      menuBtn.textContent = open ? 'Close' : 'Menu';
+      menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     });
     addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
   }

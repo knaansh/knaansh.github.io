@@ -39,7 +39,12 @@ main{overflow-x:clip}
 .socials a:hover{opacity:1}
 .socials svg{width:16px;height:16px;fill:currentColor}
 .nav .socials{justify-self:end}
-.menu-btn{display:none;justify-self:end;font:500 11px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;padding:.6rem 0}
+.menu-btn{display:none;justify-self:end;position:relative;width:44px;height:44px;margin-right:-10px}
+.menu-btn span{position:absolute;left:11px;right:11px;height:1.5px;background:currentColor;transition:transform .3s,opacity .2s}
+.menu-btn span:nth-child(1){top:15px}.menu-btn span:nth-child(2){top:21px}.menu-btn span:nth-child(3){top:27px}
+.menu-btn[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.menu-btn[aria-expanded="true"] span:nth-child(2){opacity:0}
+.menu-btn[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 
 /* dark pages (videos) */
 .dark-page{background:var(--night);color:var(--nfg)}
@@ -103,6 +108,7 @@ html.fold-in .fold i{transform:rotateX(0);transition:none}
 .sec{padding-block:clamp(64px,10vh,120px)}
 .sec-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:2.2rem}
 .night{background:var(--night);color:var(--nfg)}
+.more{display:flex;justify-content:center;margin-top:clamp(32px,5vh,48px)}
 .night .eyebrow{color:var(--nmuted)}
 
 /* page heads (inner pages) */
@@ -204,9 +210,6 @@ html.fold-in .fold i{transform:rotateX(0);transition:none}
 .foot{background:var(--night);color:var(--nfg);padding:clamp(48px,8vh,80px) var(--gutter) calc(32px + env(safe-area-inset-bottom,0px))}
 .foot .row{max-width:1140px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.6rem}
 .foot .logo img{filter:none;height:28px}
-.foot .stream{display:flex;flex-wrap:wrap;gap:.6rem 1.4rem}
-.foot .stream a{font:500 11px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;border-bottom:1px solid var(--line-d);padding-bottom:.35rem;opacity:.85}
-.foot .stream a:hover{opacity:1}
 .foot .socials svg{width:18px;height:18px}
 .foot small{display:block;max-width:1140px;margin:2rem auto 0;color:var(--nmuted);font:400 12px/1.4 var(--sans)}
 
