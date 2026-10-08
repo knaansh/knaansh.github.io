@@ -80,8 +80,7 @@
     // 4→5 walk out: the camera turns
       .to(s4, {x: '30vw', autoAlpha: 0, duration: 80, ease: 'power2.inOut'}, 700)
       .fromTo(s5, {autoAlpha: 0, x: '-30vw'}, {autoAlpha: 1, x: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, 700)
-    // S5 Contact: the bird flies out; then the camera pulls back
-      .to('[data-l="A5-fg"]', {x: '18vw', y: '-14vh', scale: .7, autoAlpha: 0, duration: 60, ease: 'power1.in'}, 820)
+    // S5 Contact: the camera pulls back
       .to(cam(s5), {scale: .86, duration: 40, ease: 'power2.inOut'}, 900);
   }
 
