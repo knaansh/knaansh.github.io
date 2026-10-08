@@ -10,10 +10,11 @@
 
   /* ---------- layer placement (1920×1080 plate space, from LAYERS-ASSETS.md) ---------- */
   const L = {
-    'A1-fg': [1180, 339, 135, 154], 'A2-hero-still': [880, 140, 690, 579], 'A3-fg': [1060, 250, 132, 146], 'A3-board': [555, 413, 521, 298],
-    'A4-fg': [1112, 281, 602, 600], 'A4-ffh': [481, 546, 380, 189], 'A4-lit': [739, 617, 387, 206],
-    'A5-fg': [1415, 160, 115, 149], 'A5-card': [778, 460, 323, 244], 'A5-flyer': [305, 315, 296, 402],
-    'm-A3-fg': [484, 148, 78, 86], 'm-A4-fg': [456, 166, 356, 355], 'm-A5-fg': [672, 23, 74, 96],
+    'A1-fg': [1181, 338, 135, 156], 'A2-hero-still': [820, 107, 740, 579], 'A2-fg': [84, 635, 1245, 445],
+    'A3-fg': [965, 118, 132, 147], 'A3-board': [600, 345, 490, 335],
+    'A4-fg': [1111, 281, 603, 599], 'A4-ffh': [225, 330, 440, 290], 'A4-lit': [552, 440, 478, 320],
+    'A5-fg': [1215, 243, 116, 149], 'A5-card': [780, 412, 300, 232], 'A5-flyer': [352, 268, 272, 382],
+    'm-A1-fg': [581, 180, 113, 130], 'm-A2-fg': [0, 480, 554, 280], 'm-A3-fg': [342, 41, 96, 104], 'm-A4-fg': [457, 161, 323, 360], 'm-A5-fg': [574, 96, 75, 98],
   };
   document.querySelectorAll('[data-l]').forEach(el => {
     const b = L[el.dataset.l]; if (!b) return;
@@ -51,6 +52,7 @@
     tl.set({}, {}, 940); // pin the length to 940 units
     // S1 Outside: dolly toward the door; the bird flies to it; the title lifts away
     tl.fromTo(cam(s1), {scale: 1, x: 0, y: 0}, {scale: 1.18, x: '-6vw', y: '-2vh', duration: 100}, 0)
+      .fromTo('[data-l="A1-fg"]', {x: 0, y: 0, rotate: 8}, {x: '9vw', y: '-3vh', rotate: -4, duration: 100}, 0)
       .to('#s-home .hero-type', {autoAlpha: 0, y: -40, duration: 40}, 0)
     // 1→2 through the door: keep zooming in, the stage is revealed from the doorway
       .to(cam(s1), {scale: 2.4, duration: 60, ease: 'power2.inOut'}, 100)
