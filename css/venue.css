@@ -283,3 +283,7 @@ img{display:block;max-width:100%}
   .mcon .h1,.sheet .h1{margin-bottom:4px} /* 12px grid gap + 4px = 16px */
   #home .mcon{align-content:start;padding-top:24px}
 }
+@media (max-width:900px){
+  .mcon{padding-bottom:40px} /* 40px from one section's content to the next section's image */
+  .mcon .h1,.sheet .h1{margin-bottom:12px} /* 12px grid gap + 12px = 24px */
+}
