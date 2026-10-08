@@ -287,3 +287,7 @@ img{display:block;max-width:100%}
   .mcon{padding-bottom:40px} /* 40px from one section's content to the next section's image */
   .mcon .h1,.sheet .h1{margin-bottom:12px} /* 12px grid gap + 12px = 24px */
 }
+@media (max-width:900px){
+  #contact .mail{margin-bottom:12px}  /* 24px email to button */
+  #contact .btn{margin-bottom:28px}   /* 40px button to footer */
+}
