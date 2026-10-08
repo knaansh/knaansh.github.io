@@ -13,7 +13,7 @@
     'A1-fg': [1180, 339, 135, 154], 'A2-hero-still': [880, 140, 690, 579], 'A3-fg': [1060, 250, 132, 146], 'A3-board': [555, 413, 521, 298],
     'A4-fg': [1112, 281, 602, 600], 'A4-ffh': [481, 546, 380, 189], 'A4-lit': [739, 617, 387, 206],
     'A5-fg': [1415, 160, 115, 149], 'A5-card': [778, 460, 323, 244], 'A5-flyer': [305, 315, 296, 402],
-    'm-A3-fg': [484, 148, 78, 86], 'm-A4-fg': [456, 166, 356, 355], 'm-A5-fg': [672, 31, 74, 96],
+    'm-A3-fg': [484, 148, 78, 86], 'm-A4-fg': [456, 166, 356, 355], 'm-A5-fg': [672, 23, 74, 96],
   };
   document.querySelectorAll('[data-l]').forEach(el => {
     const b = L[el.dataset.l]; if (!b) return;
@@ -51,7 +51,7 @@
     tl.set({}, {}, 940); // pin the length to 940 units
     // S1 Outside: dolly toward the door; the bird flies to it; the title lifts away
     tl.fromTo(cam(s1), {scale: 1, x: 0, y: 0}, {scale: 1.18, x: '-6vw', y: '-2vh', duration: 100}, 0)
-      .to('#s-home .hero-type, #s-home .cue', {autoAlpha: 0, y: -40, duration: 40}, 0)
+      .to('#s-home .hero-type', {autoAlpha: 0, y: -40, duration: 40}, 0)
     // 1→2 through the door: keep zooming in, the stage is revealed from the doorway
       .to(cam(s1), {scale: 2.4, duration: 60, ease: 'power2.inOut'}, 100)
       .to(s1, {autoAlpha: 0, duration: 24}, 136)
