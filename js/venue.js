@@ -170,7 +170,7 @@
   function stopMain(sel){ document.querySelectorAll(sel).forEach(p => { if (p.querySelector('iframe')) p.innerHTML = facade(VIDEOS[0], 0); }); }
   const cardHTML = (v, i, cls) => `<button class="${cls}" type="button" data-v="${i}"><img src="${thumb(v, i)}" alt="" loading="lazy"><span><small>Knaan Shabtay</small><b>${v[1]}</b></span></button>`;
   document.querySelectorAll('[data-upnext]').forEach(u => u.innerHTML = VIDEOS.slice(1).map((v, j) => cardHTML(v, j + 1, 'vcard')).join(''));
-  const wallCard = (v, i) => `<button class="wcard" type="button" data-v="${i}"><span class="ph"><img src="${thumb(v, i)}" alt="" loading="lazy"><i class="yt"></i></span><span class="tx"><small>${String(i + 1).padStart(2, '0')}</small><b>${v[1]}</b></span></button>`;
+  const wallCard = (v, i) => `<button class="wcard" type="button" data-v="${i}"><span class="ph"><img src="${thumb(v, i)}" alt="" decoding="async"><i class="yt"></i></span><span class="tx"><small>${String(i + 1).padStart(2, '0')}</small><b>${v[1]}</b></span></button>`;
   document.querySelectorAll('[data-vtrack]').forEach(t => t.innerHTML = VIDEOS.map(wallCard).join(''));
   document.querySelectorAll('[data-vrows]').forEach(u => u.innerHTML = VIDEOS.slice(1).map((v, j) => cardHTML(v, j + 1, 'vrow')).join(''));
   function note(btn){ const box = btn.closest('.player, .vplayer'); if (!box || box.querySelector('.pnote')) return;
