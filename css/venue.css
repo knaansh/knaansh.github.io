@@ -147,6 +147,7 @@ img{display:block;max-width:100%}
 /* scene 5: the box-office card and the flyer */
 .boxcard{position:absolute;display:grid;align-content:center;justify-items:center;gap:.5em;text-align:center;padding:1em;background:#fff;mix-blend-mode:multiply}
 .boxcard.inplate{font-size:20px} /* scales with the art, so it always fits the card */
+.boxcard > *{transform:rotate(-3deg) skewX(4deg)} /* written on the card, which tilts and leans back */
 .boxcard h3{font:600 .82em/1.15 var(--sans);letter-spacing:.1em;white-space:nowrap;text-transform:uppercase}
 .boxcard a{font-size:.86em;line-height:1.25;white-space:nowrap}
 .boxcard a.send{font:500 .68em/1 var(--mono);margin-top:.5em;letter-spacing:.14em;text-transform:uppercase;color:var(--sky)}
