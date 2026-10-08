@@ -39,7 +39,7 @@
 
   /* ---------- the night: one scrubbed timeline ---------- */
   const REEL = root.classList.contains('vid-reel'); // Videos as a scroll-driven film reel (adds scroll length after the stage)
-  const E = REEL ? 160 : 0, T = x => x > 320 ? x + E : x, TOTAL = 940 + E;
+  const E = REEL ? 160 : 0, T = x => x >= 320 ? x + E : x, TOTAL = 940 + E;
   if (REEL) document.getElementById('venue').style.height = (1040 + E) + 'vh';
   const SETTLED = {home: 0, videos: 220, tour: T(420), music: T(630), contact: T(795)}; // where each scene's content is in place
   const RANGES = [['home', 0], ['videos', 160], ['tour', T(400)], ['music', T(580)], ['contact', T(780)]];
@@ -116,15 +116,16 @@
   if (still) document.querySelectorAll('.rv').forEach(el => el.classList.add('in'));
 
   /* ---------- navigation ---------- */
-  function go(id, smooth = true){
+  function go(id){ // jump straight to the scene, no scroll-through
     let y;
     if (isDesk() && !still) y = SETTLED[id] / TOTAL * (document.getElementById('venue').offsetHeight - innerHeight);
     else { const el = isDesk() ? document.getElementById('s-' + id) : document.getElementById(id); if (!el) return; y = el.getBoundingClientRect().top + scrollY - (isDesk() ? 0 : 64); }
-    scrollTo({top: Math.max(0, y), behavior: smooth && !reduce ? 'smooth' : 'auto'});
+    scrollTo({top: Math.max(0, y), behavior: 'instant'});
+    if (tl) { ScrollTrigger.update(); const tw = tl.scrollTrigger.getTween(); if (tw) tw.progress(1); onPos(); } // skip the scrub catch-up
     history.replaceState(null, '', id === 'home' ? location.pathname : '#' + id);
   }
   navLinks.forEach(a => a.addEventListener('click', e => { e.preventDefault(); const id = a.dataset.go; if (menu.classList.contains('open')) { setMenu(false); setTimeout(() => go(id), 280); } else go(id); }));
-  addEventListener('load', () => { const h = location.hash.slice(1); if (SETTLED[h] !== undefined && h !== 'home') setTimeout(() => go(h, false), 60); onPos(); });
+  addEventListener('load', () => { const h = location.hash.slice(1); if (SETTLED[h] !== undefined && h !== 'home') setTimeout(() => go(h), 60); onPos(); });
 
   /* ---------- phone menu: drop-down paper sheet with scroll lock and focus trap ---------- */
   const menu = document.getElementById('site-menu'), toggle = document.querySelector('.nav-toggle'), scrim = document.querySelector('.scrim'), venue = document.getElementById('venue');
