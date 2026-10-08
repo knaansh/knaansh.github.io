@@ -119,7 +119,9 @@ img{display:block;max-width:100%}
 .vcard b{display:block;font-weight:500;font-size:.9em;line-height:1.25;margin-top:.3em}
 
 /* scene 3: Bandsintown on the letterboard */
-.board{position:absolute;background:rgba(253,252,248,.92);backdrop-filter:blur(2px);overflow:auto;padding:.8em 1em}
+.board{position:absolute;z-index:6;left:0;right:0;margin:0 auto;top:clamp(24px,5vh,56px);width:min(780px,56vw);max-height:calc(100% - 14vh);overflow:auto;background:var(--card);padding:clamp(20px,2.4vw,34px);box-shadow:0 1px 0 var(--line),0 24px 50px -24px rgba(0,0,0,.4)}
+.board .h1{font-size:clamp(1.8rem,2.6vw,2.6rem);margin-bottom:18px}
+.board .bit-row{font-size:11px}
 .bit-row{display:flex;justify-content:space-between;gap:10px;border:1.5px solid var(--ink);padding:.7em .9em;font:500 .62em/1 var(--mono);letter-spacing:.16em;text-transform:uppercase}
 .bit-row a{color:var(--sky);border-bottom:1px solid var(--sky)}
 .bit-fallback{display:none;text-align:center;padding:1.4em .4em .4em}
@@ -128,7 +130,7 @@ img{display:block;max-width:100%}
 .bitbox.empty .bit-fallback{display:block}
 
 /* scene 4: Spotify card */
-.spot-card{position:absolute;z-index:6;right:clamp(24px,6vw,96px);bottom:48px;width:min(420px,32vw)}
+.spot-card{position:absolute;z-index:6;left:clamp(24px,4vw,64px);bottom:40px;width:min(420px,32vw)}
 .spot-card iframe{width:100%;height:152px;border:0;border-radius:12px;display:block}
 .spot{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;align-items:center;background:#3a3836;color:#fff;border-radius:12px;padding:12px;width:100%;text-align:left}
 .spot img{width:96px;aspect-ratio:1;object-fit:cover;border-radius:6px}
@@ -137,16 +139,17 @@ img{display:block;max-width:100%}
 .spot b{display:block;font-weight:600;font-size:.95rem}
 .spot small{display:block;opacity:.75;font-size:.8rem}
 .spot em{display:inline-block;margin-top:12px;font-style:normal;font-size:.78rem;border-bottom:1px solid rgba(255,255,255,.5)}
-.covers{display:flex;gap:6px;margin-top:12px}
-.covers button img{width:40px;aspect-ratio:1;object-fit:cover;transition:transform .2s}
+.covers{display:flex;gap:10px;margin-top:14px}
+.covers button img{width:clamp(56px,4.6vw,76px);aspect-ratio:1;object-fit:cover;transition:transform .2s}
 .covers button:hover img{transform:translateY(-3px)}
 .sleeve-hit{position:absolute;cursor:pointer}
 
 /* scene 5: the box-office card and the flyer */
 .boxcard{position:absolute;display:grid;align-content:center;justify-items:center;gap:.5em;text-align:center;padding:1em;background:#fff;mix-blend-mode:multiply}
-.boxcard h3{font:600 1em/1.15 var(--sans);letter-spacing:.14em;text-transform:uppercase}
-.boxcard a{font-size:.8em}
-.boxcard a.send{font:500 .62em/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--sky)}
+.boxcard.inplate{font-size:20px} /* scales with the art, so it always fits the card */
+.boxcard h3{font:600 1.3em/1.15 var(--sans);letter-spacing:.14em;text-transform:uppercase}
+.boxcard a{font-size:1.12em;line-height:1.25}
+.boxcard a.send{font:500 .8em/1 var(--mono);margin-top:.4em;letter-spacing:.14em;text-transform:uppercase;color:var(--sky)}
 .flyer-hit{position:absolute}
 .foot{position:absolute;z-index:6;left:50%;bottom:14px;transform:translateX(-50%);display:grid;justify-items:center;gap:6px}
 .copy{font-size:.72rem;color:var(--muted);text-align:center}
