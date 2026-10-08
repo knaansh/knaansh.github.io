@@ -74,6 +74,8 @@ img{display:block;max-width:100%}
 .card-title .small{font:italic 400 1rem/1.2 var(--serif);color:var(--muted);margin-top:6px}
 .hero-type{position:absolute;z-index:6;left:clamp(32px,6vw,110px);top:clamp(28px,6vh,70px)}
 .hero-type .name{font:600 clamp(1.6rem,2.4vw,2.3rem)/1 var(--sans);letter-spacing:.2em;text-transform:uppercase}
+.album{font:500 11px/1.4 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:#5a554d;margin-top:14px}
+.album .listen{font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--sky);background:none;border:0;padding:0 0 2px;border-bottom:1px solid currentColor;cursor:pointer}
 .hero-type h1{font:italic 400 clamp(1.4rem,2vw,1.9rem)/1.2 var(--serif);color:#3f3b35;margin-top:8px}
 .cue{position:absolute;z-index:6;left:50%;bottom:22px;transform:translateX(-50%);font:500 10px/1 var(--mono);letter-spacing:.24em;text-transform:uppercase}
 .rail{position:fixed;z-index:20;right:18px;top:50%;transform:translateY(-50%);display:grid;gap:18px;justify-items:end}
@@ -187,11 +189,12 @@ img{display:block;max-width:100%}
   .mart .mfg{position:absolute;animation:par linear both;animation-timeline:view()}
   .mart .count{position:absolute;right:12px;bottom:18px;font:500 10px/1 var(--mono);letter-spacing:.16em;background:var(--card);padding:6px 8px}
   .mart .over{position:absolute;left:20px;top:22px}
-  .mcon{padding:24px 20px 44px;display:grid;gap:14px}
+  .mcon{padding:14px 20px 32px;display:grid;gap:12px}
+  .mcon .album{margin-top:0}
   .mcon .h1{font-size:38px}
   .mcon .name{font:600 24px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase}
   .mcon .sub{font:italic 400 1.5rem/1.2 var(--serif);color:#3f3b35}
-  .mcon .scroll{font:500 10px/1 var(--mono);letter-spacing:.24em;text-transform:uppercase;justify-self:center;margin-top:2rem}
+  .mcon .scroll{font:500 10px/1 var(--mono);letter-spacing:.24em;text-transform:uppercase;justify-self:center;margin-top:1rem}
   .vrows,.rrows{display:grid}
   .vrow,.rrow{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center;text-align:left;padding:8px 0}
   .rrow{grid-template-columns:48px minmax(0,1fr);border-bottom:1px solid var(--line);padding:12px 0}
