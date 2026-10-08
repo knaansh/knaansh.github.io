@@ -264,7 +264,7 @@ img{display:block;max-width:100%}
   #contact .btn{margin-bottom:28px}   /* 40px button to footer */
 }
 
-/* ===== Videos on desktop: option A, a paper wall with every video ===== */
+/* ===== Videos on desktop: a film reel of big polaroids that slides across the stage as you scroll ===== */
 .vwall{position:absolute;z-index:6;left:2.5vw;top:3vh;bottom:4vh;width:min(56vw,1040px)}
 .vwall .vp-img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .vw-in{position:absolute;inset:11% 10% 12% 10%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:clamp(10px,1.8vh,20px)}
@@ -281,8 +281,6 @@ img{display:block;max-width:100%}
 .wcard .tx{display:flex;align-items:baseline;gap:8px;min-width:0}
 .wcard small{font:500 9px/1 var(--mono);letter-spacing:.18em;color:var(--muted)}
 .wcard b{font-weight:500;font-size:clamp(.74rem,.92vw,.95rem);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-/* option B, a film reel of big polaroids that slides across the stage as you scroll */
 .vid-reel .vwall{left:0;right:0;top:0;bottom:0;width:auto}
 .vid-reel .vwall .vp-img{display:none}
 .vid-reel .vw-in{inset:0;display:block}

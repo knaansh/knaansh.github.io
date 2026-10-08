@@ -16,7 +16,6 @@
     'A5-card': [780, 412, 300, 232], 'A5-flyer': [352, 268, 272, 382],
     'm-A1-fg': [581, 180, 113, 130], 'm-A2-fg': [0, 480, 554, 280], 'm-A3-fg': [342, 41, 96, 104], 'm-A4-fg': [457, 161, 323, 360], 
   };
-  if (!root.classList.contains('vid-reel')) L['A2-hero-still'] = [1150, 107, 740, 579]; // the video wall takes the left; Knaan steps right
   document.querySelectorAll('[data-l]').forEach(el => {
     const b = L[el.dataset.l]; if (!b) return;
     if (el.dataset.l.startsWith('m-')) { // phone layers: percentages of the 780-wide art band
