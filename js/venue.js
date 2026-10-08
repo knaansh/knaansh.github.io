@@ -16,6 +16,7 @@
     'A5-card': [780, 412, 300, 232], 'A5-flyer': [352, 268, 272, 382],
     'm-A1-fg': [581, 180, 113, 130], 'm-A2-fg': [0, 480, 554, 280], 'm-A3-fg': [342, 41, 96, 104], 'm-A4-fg': [457, 161, 323, 360], 
   };
+  if (!root.classList.contains('vid-reel')) L['A2-hero-still'] = [1150, 107, 740, 579]; // the video wall takes the left; Knaan steps right
   document.querySelectorAll('[data-l]').forEach(el => {
     const b = L[el.dataset.l]; if (!b) return;
     if (el.dataset.l.startsWith('m-')) { // phone layers: percentages of the 780-wide art band
@@ -38,9 +39,12 @@
   fit(); addEventListener('resize', fit);
 
   /* ---------- the night: one scrubbed timeline ---------- */
-  const SETTLED = {home: 0, videos: 220, tour: 420, music: 630, contact: 795}; // where each scene's content is in place
-  const RANGES = [['home', 0], ['videos', 160], ['tour', 400], ['music', 580], ['contact', 780]];
-  const REVEALS = [['#s-tour .rv', 415], ['#s-music .card-title', 590], ['#s-music .spot-card', 630], ['#s-contact .rv', 790]];
+  const REEL = root.classList.contains('vid-reel'); // Videos as a scroll-driven film reel (adds scroll length after the stage)
+  const E = REEL ? 160 : 0, T = x => x > 320 ? x + E : x, TOTAL = 940 + E;
+  if (REEL) document.getElementById('venue').style.height = (1040 + E) + 'vh';
+  const SETTLED = {home: 0, videos: 220, tour: T(420), music: T(630), contact: T(795)}; // where each scene's content is in place
+  const RANGES = [['home', 0], ['videos', 160], ['tour', T(400)], ['music', T(580)], ['contact', T(780)]];
+  const REVEALS = [['#s-tour .rv', T(415)], ['#s-music .card-title', T(590)], ['#s-music .spot-card', T(630)], ['#s-contact .rv', T(790)]];
   let pos = 0, tl;
   const $ = s => document.querySelector(s);
   if (!still) {
@@ -48,8 +52,8 @@
     const [s1, s2, s3, s4, s5] = scenes, cam = s => s.querySelector('.cam');
     gsap.set([s2, s3, s4, s5], {autoAlpha: 0});
     tl = gsap.timeline({defaults: {ease: 'none'}, scrollTrigger: {trigger: '#venue', start: 'top top', end: 'bottom bottom', scrub: .6,
-      onUpdate: self => { pos = self.progress * 940; onPos(); }}});
-    tl.set({}, {}, 940); // pin the length to 940 units
+      onUpdate: self => { pos = self.progress * TOTAL; onPos(); }}});
+    tl.set({}, {}, TOTAL); // pin the length
     // S1 Outside: dolly toward the door; the bird flies to it; the title lifts away
     tl.fromTo(cam(s1), {scale: 1, x: 0, y: 0}, {scale: 1.18, x: '-6vw', y: '-2vh', duration: 100}, 0)
       .fromTo('[data-l="A1-fg"]', {x: 0, y: 0, rotate: 8}, {x: '9vw', y: '-3vh', rotate: -4, duration: 100}, 0)
@@ -62,26 +66,30 @@
     // S2 Inside = Videos: lights come up, the Videos panel rises from behind the stage lip
       .fromTo('#s-videos .ink', {opacity: .45}, {opacity: 0, duration: 30, ease: 'power1.out'}, 160)
       .to(cam(s2), {scale: 1.05, duration: 30}, 160)
-      .fromTo('#s-videos .vpanel', {y: '22vh', rotate: -2.5, autoAlpha: 0}, {y: 0, rotate: 0, duration: 40, ease: 'power3.out'}, 180)
-      .to('#s-videos .vpanel', {autoAlpha: 1, duration: 12}, 180)
+      .fromTo('#s-videos .vwall', {y: '22vh', rotate: REEL ? 0 : -2.5, autoAlpha: 0}, {y: 0, rotate: 0, autoAlpha: 1, duration: 40, ease: 'power3.out'}, 180);
+    if (REEL) { // the reel runs right to left while you keep scrolling, then the camera moves on
+      const track = $('[data-vtrack]'), dist = () => -(track.scrollWidth - innerWidth * .84);
+      tl.fromTo(track, {x: '30vw'}, {x: dist, duration: 40 + E, ease: 'none', immediateRender: false}, 205);
+    }
+    tl
     // 2→3 pan right along the stage
-      .to(s2, {x: '-35vw', duration: 80, ease: 'power1.inOut'}, 320)
-      .to(s2, {autoAlpha: 0, duration: 24}, 376)
-      .fromTo(s3, {autoAlpha: 0, x: '35vw'}, {autoAlpha: 1, x: 0, duration: 80, ease: 'power1.inOut', immediateRender: false}, 320)
+      .to(s2, {x: '-35vw', duration: 80, ease: 'power1.inOut'}, T(320))
+      .to(s2, {autoAlpha: 0, duration: 24}, T(376))
+      .fromTo(s3, {autoAlpha: 0, x: '35vw'}, {autoAlpha: 1, x: 0, duration: 80, ease: 'power1.inOut', immediateRender: false}, T(320))
     // S3 Tour: the board settles, the bird hops
-      .fromTo(cam(s3), {scale: 1.04}, {scale: 1, duration: 100, immediateRender: false}, 400)
-      .to('[data-l="A3-fg"]', {keyframes: [{y: -10, x: '-.5vw'}, {y: 0, x: '-1vw'}], duration: 100}, 400)
+      .fromTo(cam(s3), {scale: 1.04}, {scale: 1, duration: 100, immediateRender: false}, T(400))
+      .to('[data-l="A3-fg"]', {keyframes: [{y: -10, x: '-.5vw'}, {y: 0, x: '-1vw'}], duration: 100}, T(400))
     // 3→4 tilt down to the merch table
-      .to(s3, {y: '-40vh', autoAlpha: 0, duration: 80, ease: 'power2.inOut'}, 500)
-      .fromTo(s4, {autoAlpha: 0, y: '40vh'}, {autoAlpha: 1, y: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, 500)
-      .fromTo(cam(s4), {scale: 1.08}, {scale: 1, duration: 80, ease: 'power2.inOut', immediateRender: false}, 500)
+      .to(s3, {y: '-40vh', autoAlpha: 0, duration: 80, ease: 'power2.inOut'}, T(500))
+      .fromTo(s4, {autoAlpha: 0, y: '40vh'}, {autoAlpha: 1, y: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(500))
+      .fromTo(cam(s4), {scale: 1.08}, {scale: 1, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(500))
     // S4 Music: pick up the record
-      .fromTo('[data-l="A4-fg"]', {x: '-14vw', y: '16vh', rotate: -2, scale: .72}, {x: 0, y: 0, rotate: -7, scale: 1, duration: 50, ease: 'power2.out', immediateRender: false}, 580)
+      .fromTo('[data-l="A4-fg"]', {x: '-14vw', y: '16vh', rotate: -2, scale: .72}, {x: 0, y: 0, rotate: -7, scale: 1, duration: 50, ease: 'power2.out', immediateRender: false}, T(580))
     // 4→5 walk out: the camera turns
-      .to(s4, {x: '30vw', autoAlpha: 0, duration: 80, ease: 'power2.inOut'}, 700)
-      .fromTo(s5, {autoAlpha: 0, x: '-30vw'}, {autoAlpha: 1, x: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, 700)
+      .to(s4, {x: '30vw', autoAlpha: 0, duration: 80, ease: 'power2.inOut'}, T(700))
+      .fromTo(s5, {autoAlpha: 0, x: '-30vw'}, {autoAlpha: 1, x: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(700))
     // S5 Contact: the camera pulls back
-      .to(cam(s5), {scale: .86, duration: 40, ease: 'power2.inOut'}, 900);
+      .to(cam(s5), {scale: .86, duration: 40, ease: 'power2.inOut'}, T(900));
   }
 
   /* ---------- per-position updates: reveals, nav state, lazy embeds ---------- */
@@ -97,9 +105,9 @@
   function onPos(){
     if (!still && isDesk()) {
       REVEALS.forEach(([sel, at]) => document.querySelectorAll(sel).forEach(el => el.classList.toggle('in', pos >= at)));
-      $('.back-start').classList.toggle('on', pos >= 905);
-      if (pos > 360) stopMain('[data-player]'); // pause a playing video once Videos leaves the frame
-      if (pos > 550) loadSpotify();
+      $('.back-start').classList.toggle('on', pos >= T(905));
+      if (pos > T(360)) stopMain('[data-player]'); // pause a playing video once Videos leaves the frame
+      if (pos > T(550)) loadSpotify();
     }
     const id = current();
     navLinks.forEach(a => { const on = a.dataset.go === id && id !== 'home'; a.toggleAttribute('aria-current', on); if (on) a.setAttribute('aria-current', a.closest('#site-menu') ? 'page' : 'true'); });
@@ -111,7 +119,7 @@
   /* ---------- navigation ---------- */
   function go(id, smooth = true){
     let y;
-    if (isDesk() && !still) y = SETTLED[id] / 940 * (document.getElementById('venue').offsetHeight - innerHeight);
+    if (isDesk() && !still) y = SETTLED[id] / TOTAL * (document.getElementById('venue').offsetHeight - innerHeight);
     else { const el = isDesk() ? document.getElementById('s-' + id) : document.getElementById(id); if (!el) return; y = el.getBoundingClientRect().top + scrollY - (isDesk() ? 0 : 64); }
     scrollTo({top: Math.max(0, y), behavior: smooth && !reduce ? 'smooth' : 'auto'});
     history.replaceState(null, '', id === 'home' ? location.pathname : '#' + id);
@@ -132,6 +140,7 @@
   scrim.addEventListener('click', () => setMenu(false));
   addEventListener('keydown', e => {
     if (e.key === 'Escape') { if (menu.classList.contains('open')) setMenu(false); closePop(); }
+    if (pop.classList.contains('cinema') && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) openVideo(vNow + (e.key === 'ArrowRight' ? 1 : -1));
     if (e.key === 'Tab' && menu.classList.contains('open')) {
       const f = [...menu.querySelectorAll('a'), toggle], i = f.indexOf(document.activeElement);
       if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
@@ -155,6 +164,8 @@
   function stopMain(sel){ document.querySelectorAll(sel).forEach(p => { if (p.querySelector('iframe')) p.innerHTML = facade(VIDEOS[0], 0); }); }
   const cardHTML = (v, i, cls) => `<button class="${cls}" type="button" data-v="${i}"><img src="${thumb(v, i)}" alt="" loading="lazy"><span><small>Knaan Shabtay</small><b>${v[1]}</b></span></button>`;
   document.querySelectorAll('[data-upnext]').forEach(u => u.innerHTML = VIDEOS.slice(1).map((v, j) => cardHTML(v, j + 1, 'vcard')).join(''));
+  const wallCard = (v, i) => `<button class="wcard" type="button" data-v="${i}"><span class="ph"><img src="${thumb(v, i)}" alt="" loading="lazy"><i class="yt"></i></span><span class="tx"><small>${String(i + 1).padStart(2, '0')}</small><b>${v[1]}</b></span></button>`;
+  document.querySelectorAll('[data-vtrack]').forEach(t => t.innerHTML = VIDEOS.map(wallCard).join(''));
   document.querySelectorAll('[data-vrows]').forEach(u => u.innerHTML = VIDEOS.slice(1).map((v, j) => cardHTML(v, j + 1, 'vrow')).join(''));
   function note(btn){ const box = btn.closest('.player, .vplayer'); if (!box || box.querySelector('.pnote')) return;
     box.insertAdjacentHTML('beforeend', `<div class="pnote"><p>On the live site the video plays right here.</p><a href="${btn.href}" target="_blank" rel="noopener">Open on YouTube ↗</a></div>`); }
@@ -191,19 +202,22 @@
     box.innerHTML = `<div class="tt"><div class="slv"><img src="${cover(id)}" alt="${r[0]} cover"></div><div class="disc" style="--lbl:url('${new URL(cover(id), location.href).href}')"><i></i></div></div>
       <div class="info"><p class="kicker">${r[1]}${r[2] ? ' · ' + r[2] : ''}</p><h3>${r[0]}</h3>${r[6] ? `<p class="liner">${r[6]}</p>` : ''}${EMBEDS ? spotFrame(r, 'spotify') : ''}
         <div class="stream"><a href="https://open.spotify.com/album/${r[3]}" target="_blank" rel="noopener">Spotify</a><a href="${r[4]}" target="_blank" rel="noopener">Apple Music</a><a href="${r[5]}" target="_blank" rel="noopener">YouTube Music</a></div></div>`;
-    pop.classList.remove('video'); pop.classList.add('open'); pop.querySelector('.x').focus();
+    pop.classList.remove('video', 'cinema'); pop.classList.add('open'); pop.querySelector('.x').focus();
     picked = id; renderSpot();
   }
-  function openVideo(i){
-    const v = VIDEOS[i]; if (!v) return; stopMain('[data-player]');
+  let vNow = 0;
+  function openVideo(i){ // cinema: the video takes the whole window, with previous / next
+    i = (i + VIDEOS.length) % VIDEOS.length; const v = VIDEOS[i]; if (!v) return; stopMain('[data-player]'); vNow = i;
     box.innerHTML = `<div class="vplayer">${EMBEDS ? ytFrame(v[0], v[1]) : facade(v, i)}</div>
-      <div class="info"><p class="kicker">Video · Knaan Shabtay</p><h3>${v[1]}</h3><div class="stream"><a href="https://www.youtube.com/watch?v=${v[0]}" target="_blank" rel="noopener">Watch on YouTube</a></div></div>`;
-    pop.classList.add('video', 'open'); pop.querySelector('.x').focus();
+      <div class="cbar"><div><p class="kicker">${String(i + 1).padStart(2, '0')} / ${String(VIDEOS.length).padStart(2, '0')} · Knaan Shabtay</p><h3>${v[1]}</h3></div>
+        <div class="cnav"><button type="button" data-vstep="-1" aria-label="Previous video">←</button><button type="button" data-vstep="1" aria-label="Next video">→</button><a href="https://www.youtube.com/watch?v=${v[0]}" target="_blank" rel="noopener">YouTube ↗</a></div></div>`;
+    pop.classList.add('video', 'cinema', 'open'); pop.querySelector('.x').focus();
   }
-  function closePop(){ if (!pop.classList.contains('open')) return; pop.classList.remove('open', 'video'); box.innerHTML = ''; }
+  function closePop(){ if (!pop.classList.contains('open')) return; pop.classList.remove('open', 'video', 'cinema'); box.innerHTML = ''; }
   document.addEventListener('click', e => {
     const play = e.target.closest('[data-play]');
     if (play) { e.preventDefault(); if (!EMBEDS) return note(play); const p = play.closest('[data-player]'); if (p) p.innerHTML = ytFrame(VIDEOS[+play.dataset.play][0], VIDEOS[+play.dataset.play][1]); return; }
+    const st = e.target.closest('[data-vstep]'); if (st) return openVideo(vNow + +st.dataset.vstep);
     const v = e.target.closest('[data-v]'); if (v) return openVideo(+v.dataset.v);
     const r = e.target.closest('[data-rec]'); if (r) return openRecord(r.dataset.rec);
     if (e.target.closest('[data-close]') || e.target === pop) closePop();

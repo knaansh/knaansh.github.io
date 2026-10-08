@@ -263,3 +263,49 @@ img{display:block;max-width:100%}
   #contact .mail{margin-bottom:12px}  /* 24px email to button */
   #contact .btn{margin-bottom:28px}   /* 40px button to footer */
 }
+
+/* ===== Videos on desktop: option A, a paper wall with every video ===== */
+.vwall{position:absolute;z-index:6;left:2.5vw;top:3vh;bottom:4vh;width:min(56vw,1040px)}
+.vwall .vp-img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.vw-in{position:absolute;inset:11% 10% 12% 10%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:clamp(10px,1.8vh,20px)}
+.vw-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+.vw-head .h1{font-size:clamp(1.8rem,2.6vw,2.8rem)}
+.vw-hint{font:500 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.vw-track{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:clamp(10px,1.4vw,20px);min-height:0}
+.wcard{display:grid;grid-template-rows:minmax(0,1fr) auto;gap:7px;text-align:left;min-height:0;cursor:pointer}
+.wcard .ph{position:relative;display:block;overflow:hidden;background:#111;min-height:0}
+.wcard .ph img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.wcard .yt{opacity:.92;transform:translate(-50%,-50%) scale(.8);transition:transform .25s,opacity .25s}
+.wcard:hover .ph img,.wcard:focus-visible .ph img{transform:scale(1.06)}
+.wcard:hover .yt,.wcard:focus-visible .yt{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.wcard .tx{display:flex;align-items:baseline;gap:8px;min-width:0}
+.wcard small{font:500 9px/1 var(--mono);letter-spacing:.18em;color:var(--muted)}
+.wcard b{font-weight:500;font-size:clamp(.74rem,.92vw,.95rem);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* option B, a film reel of big polaroids that slides across the stage as you scroll */
+.vid-reel .vwall{left:0;right:0;top:0;bottom:0;width:auto}
+.vid-reel .vwall .vp-img{display:none}
+.vid-reel .vw-in{inset:0;display:block}
+.vid-reel .vw-head{position:absolute;left:clamp(24px,4vw,64px);top:clamp(20px,4vh,48px);display:block;background:var(--card);padding:.55rem .95rem;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.vid-reel .vw-head .h1{font-size:clamp(1.6rem,2.2vw,2.4rem)}
+.vid-reel .vw-hint{margin-top:6px}
+.vid-reel .vw-track{position:absolute;left:0;top:50%;margin-top:-10vw;display:flex;gap:3.2vw;padding:0 8vw;grid-template:none}
+.vid-reel .wcard{position:relative;flex:0 0 34vw;display:block;background:#fdfcf8;padding:12px 12px 0;box-shadow:0 2px 3px rgba(0,0,0,.1),0 28px 40px -24px rgba(0,0,0,.5)}
+.vid-reel .wcard:nth-child(odd){transform:rotate(-1.4deg)}.vid-reel .wcard:nth-child(even){transform:rotate(1.1deg) translateY(2vw)}
+.vid-reel .wcard::before{content:"";position:absolute;left:50%;top:-12px;width:90px;height:26px;margin-left:-45px;background:rgba(232,222,190,.85);transform:rotate(-3deg);z-index:1}
+.vid-reel .wcard .ph{aspect-ratio:16/9}
+.vid-reel .wcard .tx{padding:12px 4px 16px}
+.vid-reel .wcard b{font:italic 400 clamp(1rem,1.4vw,1.35rem)/1.2 var(--serif)}
+
+/* the cinema: any video fills the window, with previous / next */
+.pop.cinema{background:rgba(16,15,14,.96);backdrop-filter:none}
+.pop.cinema .box{width:min(92vw,calc((100vh - 230px) * 16 / 9));grid-template-columns:1fr;gap:18px;background:none;box-shadow:none;padding:0;color:#fbf9f4;overflow:visible;max-height:none}
+.pop.cinema .cbar{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
+.pop.cinema .kicker{color:rgba(251,249,244,.6)}
+.pop.cinema h3{color:#fbf9f4;font-size:clamp(1.3rem,2.2vw,2rem)}
+.cnav{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.cnav button{width:44px;height:44px;border:1px solid rgba(251,249,244,.4);color:#fbf9f4;font-size:18px;line-height:1}
+.cnav button:hover,.cnav button:focus-visible{background:#fbf9f4;color:#141414}
+.cnav a{margin-left:10px;color:#fbf9f4;font:500 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;border-bottom:1px solid rgba(251,249,244,.5);padding-bottom:3px}
+.pop.cinema .x{background:transparent;color:#fbf9f4;border-color:rgba(251,249,244,.4)}
+@media (max-width:900px){ .pop.cinema .cbar{flex-direction:column;align-items:flex-start} }
