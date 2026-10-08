@@ -13,8 +13,8 @@
     'A1-fg': [1181, 338, 135, 156], 'A2-hero-still': [820, 107, 740, 579], 'A2-fg': [84, 635, 1245, 445],
     'A3-fg': [965, 118, 132, 147], 'A3-board': [600, 345, 490, 335],
     'A4-fg': [1111, 281, 603, 599], 'A4-ffh': [225, 330, 440, 290], 'A4-lit': [552, 440, 478, 320],
-    'A5-card': [780, 412, 300, 232], 'A5-flyer': [352, 268, 272, 382],
-    'm-A1-fg': [581, 180, 113, 130], 'm-A2-fg': [0, 480, 554, 280], 'm-A3-fg': [342, 41, 96, 104], 'm-A4-fg': [457, 161, 323, 360], 
+    'A5-card': [752, 396, 356, 272], 'A6-fg': [1184, 499, 170, 196], 'A5-flyer': [352, 268, 272, 382],
+    'm-A1-fg': [581, 180, 113, 130], 'm-A2-fg': [0, 480, 554, 280], 'm-A3-fg': [342, 41, 96, 104], 'm-A4-fg': [457, 161, 323, 360], 'm-A6-fg': [282, 338, 115, 133], 
   };
   document.querySelectorAll('[data-l]').forEach(el => {
     const b = L[el.dataset.l]; if (!b) return;
@@ -33,23 +33,25 @@
       plate.style.transform = `translate(${(W - 1920 * s) / 2}px,${(H - 1080 * s) / 2}px) scale(${s})`;
       plate.style.setProperty('--s', s);
       sc.querySelector('.cam').style.transformOrigin = sc.dataset.origin;
+      const hero = sc.querySelector('.hero-type'); // the title sits in the art, where the sky begins
+      if (hero) Object.assign(hero.style, {left: (W - 1920 * s) / 2 + 480 * s + 'px', top: (H - 1080 * s) / 2 + 138 * s + 'px'});
     });
   }
   fit(); addEventListener('resize', fit);
 
   /* ---------- the night: one scrubbed timeline ---------- */
   const REEL = root.classList.contains('vid-reel'); // Videos as a scroll-driven film reel (adds scroll length after the stage)
-  const E = REEL ? 160 : 0, T = x => x > 320 ? x + E : x, TOTAL = 940 + E;
-  if (REEL) document.getElementById('venue').style.height = (1040 + E) + 'vh';
-  const SETTLED = {home: 0, videos: 220, tour: T(420), music: T(630), contact: T(795)}; // where each scene's content is in place
-  const RANGES = [['home', 0], ['videos', 160], ['tour', T(400)], ['music', T(580)], ['contact', T(780)]];
-  const REVEALS = [['#s-tour .rv', T(415)], ['#s-music .card-title', T(590)], ['#s-music .spot-card', T(630)], ['#s-contact .rv', T(790)]];
+  const E = REEL ? 160 : 0, T = x => x >= 320 ? x + E : x, TOTAL = 1060 + E;
+  document.getElementById('venue').style.setProperty('--extra', E + 'vh'); // desktop only: the phone stack sets its own height
+  const SETTLED = {home: 0, videos: 220, tour: T(420), music: T(630), contact: T(795), list: T(965)}; // where each scene's content is in place
+  const RANGES = [['home', 0], ['videos', 160], ['tour', T(400)], ['music', T(580)], ['contact', T(780)], ['list', T(890)]];
+  const REVEALS = [['#s-tour .rv', T(415)], ['#s-music .card-title', T(590)], ['#s-music .spot-card', T(630)], ['#s-contact .rv', T(790)], ['#s-list .rv', T(950)]];
   let pos = 0, tl;
   const $ = s => document.querySelector(s);
   if (!still) {
     gsap.registerPlugin(ScrollTrigger);
-    const [s1, s2, s3, s4, s5] = scenes, cam = s => s.querySelector('.cam');
-    gsap.set([s2, s3, s4, s5], {autoAlpha: 0});
+    const [s1, s2, s3, s4, s5, s6] = scenes, cam = s => s.querySelector('.cam');
+    gsap.set([s2, s3, s4, s5, s6], {autoAlpha: 0});
     tl = gsap.timeline({defaults: {ease: 'none'}, scrollTrigger: {trigger: '#venue', start: 'top top', end: 'bottom bottom', scrub: .6,
       onUpdate: self => { pos = self.progress * TOTAL; onPos(); }}});
     tl.set({}, {}, TOTAL); // pin the length
@@ -87,8 +89,14 @@
     // 4→5 walk out: the camera turns
       .to(s4, {x: '30vw', autoAlpha: 0, duration: 80, ease: 'power2.inOut'}, T(700))
       .fromTo(s5, {autoAlpha: 0, x: '-30vw'}, {autoAlpha: 1, x: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(700))
-    // S5 Contact: the camera pulls back
-      .to(cam(s5), {scale: .86, duration: 40, ease: 'power2.inOut'}, T(900));
+    // 5→6 step out into the street under the stars: the mailing list
+      .to(cam(s5), {scale: 1.55, x: '-20vw', y: '6vh', duration: 80, ease: 'power2.inOut'}, T(860))
+      .to(s5, {autoAlpha: 0, duration: 30}, T(905))
+      .fromTo(s6, {autoAlpha: 0}, {autoAlpha: 1, duration: 30, immediateRender: false}, T(900))
+      .fromTo('[data-l="A6-fg"]', {x: '-8vw', y: '-6vh', rotate: -8}, {x: 0, y: 0, rotate: 0, duration: 60, ease: 'power2.out', immediateRender: false}, T(910))
+      .fromTo(cam(s6), {scale: 1.35, x: '8vw'}, {scale: 1.08, x: 0, duration: 70, ease: 'power2.out', immediateRender: false}, T(900))
+    // S6: the camera eases back as the night ends
+      .to(cam(s6), {scale: 1, duration: 40, ease: 'power2.inOut'}, T(1020));
   }
 
   /* ---------- per-position updates: reveals, nav state, lazy embeds ---------- */
@@ -104,7 +112,7 @@
   function onPos(){
     if (!still && isDesk()) {
       REVEALS.forEach(([sel, at]) => document.querySelectorAll(sel).forEach(el => el.classList.toggle('in', pos >= at)));
-      $('.back-start').classList.toggle('on', pos >= T(905));
+      $('.back-start').classList.toggle('on', pos >= T(1025));
       if (pos > T(360)) stopMain('[data-player]'); // pause a playing video once Videos leaves the frame
       if (pos > T(550)) loadSpotify();
     }
@@ -116,15 +124,16 @@
   if (still) document.querySelectorAll('.rv').forEach(el => el.classList.add('in'));
 
   /* ---------- navigation ---------- */
-  function go(id, smooth = true){
+  function go(id){ // jump straight to the scene, no scroll-through
     let y;
     if (isDesk() && !still) y = SETTLED[id] / TOTAL * (document.getElementById('venue').offsetHeight - innerHeight);
     else { const el = isDesk() ? document.getElementById('s-' + id) : document.getElementById(id); if (!el) return; y = el.getBoundingClientRect().top + scrollY - (isDesk() ? 0 : 64); }
-    scrollTo({top: Math.max(0, y), behavior: smooth && !reduce ? 'smooth' : 'auto'});
+    scrollTo({top: Math.max(0, y), behavior: 'instant'});
+    if (tl) { ScrollTrigger.update(); const tw = tl.scrollTrigger.getTween(); if (tw) tw.progress(1); onPos(); } // skip the scrub catch-up
     history.replaceState(null, '', id === 'home' ? location.pathname : '#' + id);
   }
   navLinks.forEach(a => a.addEventListener('click', e => { e.preventDefault(); const id = a.dataset.go; if (menu.classList.contains('open')) { setMenu(false); setTimeout(() => go(id), 280); } else go(id); }));
-  addEventListener('load', () => { const h = location.hash.slice(1); if (SETTLED[h] !== undefined && h !== 'home') setTimeout(() => go(h, false), 60); onPos(); });
+  addEventListener('load', () => { const h = location.hash.slice(1); if (SETTLED[h] !== undefined && h !== 'home') setTimeout(() => go(h), 60); onPos(); });
 
   /* ---------- phone menu: drop-down paper sheet with scroll lock and focus trap ---------- */
   const menu = document.getElementById('site-menu'), toggle = document.querySelector('.nav-toggle'), scrim = document.querySelector('.scrim'), venue = document.getElementById('venue');
@@ -221,6 +230,25 @@
     const r = e.target.closest('[data-rec]'); if (r) return openRecord(r.dataset.rec);
     if (e.target.closest('[data-close]') || e.target === pop) closePop();
   });
+
+  /* ---------- mailing list: Mailchimp, sent in the background so visitors stay on the page ---------- */
+  const MC_URL = 'https://facebook.us9.list-manage.com/subscribe/post?u=965c56aced1fe16ff98acb01f&id=e2347265b1&f_id=001ad5e3f0'; // Mailchimp › Audience › Signup forms › Embedded form › the form's action="…list-manage.com/subscribe/post?u=…&id=…"
+  document.querySelectorAll('[data-mc]').forEach(f => f.addEventListener('submit', e => {
+    e.preventDefault();
+    const input = f.querySelector('input[type=email]'), msg = f.querySelector('.mc-msg'), email = input.value.trim();
+    const say = (t, cls) => { msg.textContent = t; msg.className = 'mc-msg ' + (cls || ''); };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return say('That email doesn\u2019t look right.', 'err');
+    if (!MC_URL || !EMBEDS) return say('Sign-ups open soon. Thanks for your patience!', 'err');
+    const cb = 'mc' + Date.now(), s = document.createElement('script');
+    const done = () => { delete window[cb]; s.remove(); f.querySelector('button').disabled = false; };
+    const timer = setTimeout(() => { done(); say('Something went wrong. Please try again.', 'err'); }, 9000);
+    window[cb] = d => { clearTimeout(timer); done();
+      if (d.result === 'success') { say('You\u2019re on the list. Thanks!', 'ok'); input.value = ''; }
+      else say(/already subscribed/i.test(d.msg) ? 'You\u2019re already on the list.' : 'Something went wrong. Please try again.', 'err'); };
+    f.querySelector('button').disabled = true; say('Sending\u2026');
+    s.src = MC_URL.replace('/post?', '/post-json?') + '&EMAIL=' + encodeURIComponent(email) + '&b_965c56aced1fe16ff98acb01f_e2347265b1=&c=' + cb;
+    document.body.appendChild(s);
+  }));
 
   /* ---------- Bandsintown: the visible slot gets the real widget ---------- */
   function loadBIT(){
