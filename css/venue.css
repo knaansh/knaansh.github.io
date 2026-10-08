@@ -277,3 +277,9 @@ img{display:block;max-width:100%}
 }
 @media (max-width:900px){ html.full #home.msec{flex-direction:row;min-height:0} }
 
+/* phone spacing: 24px from each image to its title, 16px from the title to what follows; hero text sits right under its image */
+@media (max-width:900px){
+  .mcon{padding-top:24px}
+  .mcon .h1,.sheet .h1{margin-bottom:4px} /* 12px grid gap + 4px = 16px */
+  #home .mcon{align-content:start;padding-top:24px}
+}
