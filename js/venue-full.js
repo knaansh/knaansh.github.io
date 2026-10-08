@@ -30,32 +30,37 @@
     addEventListener('scroll', show, {passive: true}); show(); return;
   }
   gsap.registerPlugin(ScrollTrigger);
-  gsap.set([a2, a3, a4, a5], {autoAlpha: 0});
-  const move = (k, build) => build(gsap.timeline({defaults: {ease: 'none'},
-    scrollTrigger: {trigger: gap(k), start: 'top bottom', end: 'top 20%', scrub: .5}}));
-
-  // the bird drifts toward the door while the title is up
-  gsap.to('[data-l="m-A1-fg"]', {x: 26, y: -14, rotate: -6, ease: 'none', scrollTrigger: {trigger: '#home', start: 'top top', end: 'bottom top', scrub: .5}});
-  // 1 → 2: walk up to the door, through the warm light, onto the stage
-  move('videos', tl => tl
-    .to('.herotext', {autoAlpha: 0, y: -30, duration: .2}, .05)
-    .fromTo(a1, {scale: 1}, {scale: 3.2, duration: .85, ease: 'power2.in'}, .15)
-    .fromTo(glow, {opacity: 0}, {opacity: 1, duration: .35}, .45)
-    .set(a1, {autoAlpha: 0}, .8)
-    .fromTo(a2, {autoAlpha: 0, scale: 1.25}, {autoAlpha: 1, scale: 1, duration: .45, ease: 'power2.out', immediateRender: false}, .8)
-    .to(glow, {opacity: 0, duration: .3}, .85));
-  // 2 → 3: the camera turns along the stage to the tour board
-  move('tour', tl => tl
-    .fromTo(a2, {xPercent: 0, autoAlpha: 1}, {xPercent: -40, autoAlpha: 0, duration: 1, ease: 'power1.inOut', immediateRender: false}, 0)
-    .fromTo(a3, {xPercent: 40, autoAlpha: 0}, {xPercent: 0, autoAlpha: 1, duration: 1, ease: 'power1.inOut', immediateRender: false}, 0));
-  // 3 → 4: tilt down to the merch table, the record lifts off it
-  move('music', tl => tl
-    .fromTo(a3, {yPercent: 0, autoAlpha: 1}, {yPercent: -30, autoAlpha: 0, duration: 1, ease: 'power2.inOut', immediateRender: false}, 0)
-    .fromTo(a4, {yPercent: 30, autoAlpha: 0}, {yPercent: 0, autoAlpha: 1, duration: 1, ease: 'power2.inOut', immediateRender: false}, 0)
-    .fromTo('[data-l="m-A4-fg"]', {x: -60, y: 50, rotate: -2, scale: .8}, {x: 0, y: 0, rotate: 0, scale: 1, duration: .6, ease: 'power2.out', immediateRender: false}, .4));
-  // 4 → 5: turn back toward the door and walk out into the night
-  move('contact', tl => tl
-    .fromTo(a4, {xPercent: 0, autoAlpha: 1}, {xPercent: 35, autoAlpha: 0, duration: 1, ease: 'power2.inOut', immediateRender: false}, 0)
-    .fromTo(a5, {xPercent: -35, autoAlpha: 0}, {xPercent: 0, autoAlpha: 1, duration: 1, ease: 'power2.inOut', immediateRender: false}, 0));
-  addEventListener('load', () => { fit(); ScrollTrigger.refresh(); });
+  /* one timeline over the whole page, in pixels of scroll, so scrubbing either way always lands in a clean state */
+  let tl;
+  function build(){
+    if (tl) { tl.scrollTrigger.kill(); tl.kill(); }
+    gsap.set(arts, {clearProps: 'transform,opacity,visibility'}); gsap.set(glow, {opacity: 0}); gsap.set('.herotext', {clearProps: 'all'});
+    gsap.set([a2, a3, a4, a5], {autoAlpha: 0});
+    const vh = innerHeight, max = document.documentElement.scrollHeight - vh;
+    const at = k => gap(k).getBoundingClientRect().top + scrollY - vh, len = vh * .8; // a move runs while its gap rises from the bottom edge to 20% from the top
+    tl = gsap.timeline({defaults: {ease: 'none'}, scrollTrigger: {start: 0, end: max, scrub: .5}});
+    tl.set({}, {}, max);
+    let s = at('videos'); // 1 → 2: walk up to the door, through the warm light, onto the stage
+    tl.to('.herotext', {autoAlpha: 0, y: -30, duration: len * .2}, s + len * .05)
+      .fromTo(a1, {scale: 1}, {scale: 3.2, duration: len * .85, ease: 'power2.in'}, s + len * .15)
+      .fromTo(glow, {opacity: 0}, {opacity: 1, duration: len * .35}, s + len * .45)
+      .set(a1, {autoAlpha: 0}, s + len * .8)
+      .fromTo(a2, {autoAlpha: 0, scale: 1.25}, {autoAlpha: 1, scale: 1, duration: len * .45, ease: 'power2.out', immediateRender: false}, s + len * .8)
+      .to(glow, {opacity: 0, duration: len * .3}, s + len * .85);
+    s = at('tour'); // 2 → 3: the camera turns along the stage to the tour board
+    tl.fromTo(a2, {xPercent: 0}, {xPercent: -40, autoAlpha: 0, duration: len, ease: 'power1.inOut', immediateRender: false}, s)
+      .fromTo(a3, {xPercent: 40, autoAlpha: 0}, {xPercent: 0, autoAlpha: 1, duration: len, ease: 'power1.inOut', immediateRender: false}, s);
+    s = at('music'); // 3 → 4: tilt down to the merch table, the record lifts off it
+    tl.fromTo(a3, {yPercent: 0}, {yPercent: -30, autoAlpha: 0, duration: len, ease: 'power2.inOut', immediateRender: false}, s)
+      .fromTo(a4, {yPercent: 30, autoAlpha: 0}, {yPercent: 0, autoAlpha: 1, duration: len, ease: 'power2.inOut', immediateRender: false}, s)
+      .fromTo('.fsbg [data-l="m-A4-fg"]', {x: -60, y: 50, scale: .8}, {x: 0, y: 0, scale: 1, duration: len * .6, ease: 'power2.out', immediateRender: false}, s + len * .4);
+    s = at('contact'); // 4 → 5: turn back toward the door and walk out into the night
+    tl.fromTo(a4, {xPercent: 0}, {xPercent: 35, autoAlpha: 0, duration: len, ease: 'power2.inOut', immediateRender: false}, s)
+      .fromTo(a5, {xPercent: -35, autoAlpha: 0}, {xPercent: 0, autoAlpha: 1, duration: len, ease: 'power2.inOut', immediateRender: false}, s);
+    tl.progress(Math.min(1, scrollY / max)); // land on the current frame right away after a rebuild
+  }
+  build();
+  let rb; const rebuild = () => { clearTimeout(rb); rb = setTimeout(() => { fit(); build(); }, 120); };
+  addEventListener('resize', rebuild);
+  new ResizeObserver(rebuild).observe(document.querySelector('.fsflow')); // lazy images and embeds change the page length
 })();
