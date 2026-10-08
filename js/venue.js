@@ -231,7 +231,7 @@
   });
 
   /* ---------- mailing list: Mailchimp, sent in the background so visitors stay on the page ---------- */
-  const MC_URL = ''; // Mailchimp › Audience › Signup forms › Embedded form › the form's action="…list-manage.com/subscribe/post?u=…&id=…"
+  const MC_URL = 'https://facebook.us9.list-manage.com/subscribe/post?u=965c56aced1fe16ff98acb01f&id=e2347265b1&f_id=001ad5e3f0'; // Mailchimp › Audience › Signup forms › Embedded form › the form's action="…list-manage.com/subscribe/post?u=…&id=…"
   document.querySelectorAll('[data-mc]').forEach(f => f.addEventListener('submit', e => {
     e.preventDefault();
     const input = f.querySelector('input[type=email]'), msg = f.querySelector('.mc-msg'), email = input.value.trim();
@@ -245,7 +245,7 @@
       if (d.result === 'success') { say('You\u2019re on the list. Thanks!', 'ok'); input.value = ''; }
       else say(/already subscribed/i.test(d.msg) ? 'You\u2019re already on the list.' : 'Something went wrong. Please try again.', 'err'); };
     f.querySelector('button').disabled = true; say('Sending\u2026');
-    s.src = MC_URL.replace('/post?', '/post-json?') + '&EMAIL=' + encodeURIComponent(email) + '&c=' + cb;
+    s.src = MC_URL.replace('/post?', '/post-json?') + '&EMAIL=' + encodeURIComponent(email) + '&b_965c56aced1fe16ff98acb01f_e2347265b1=&c=' + cb;
     document.body.appendChild(s);
   }));
 
