@@ -13,8 +13,8 @@
     'A1-fg': [1181, 338, 135, 156], 'A2-hero-still': [820, 107, 740, 579], 'A2-fg': [84, 635, 1245, 445],
     'A3-fg': [965, 118, 132, 147], 'A3-board': [600, 345, 490, 335],
     'A4-fg': [1111, 281, 603, 599], 'A4-ffh': [225, 330, 440, 290], 'A4-lit': [552, 440, 478, 320],
-    'A5-card': [752, 396, 356, 272], 'A5-flyer': [352, 268, 272, 382],
-    'm-A1-fg': [581, 180, 113, 130], 'm-A2-fg': [0, 480, 554, 280], 'm-A3-fg': [342, 41, 96, 104], 'm-A4-fg': [457, 161, 323, 360], 
+    'A5-card': [752, 396, 356, 272], 'A6-fg': [1184, 499, 170, 196], 'A5-flyer': [352, 268, 272, 382],
+    'm-A1-fg': [581, 180, 113, 130], 'm-A2-fg': [0, 480, 554, 280], 'm-A3-fg': [342, 41, 96, 104], 'm-A4-fg': [457, 161, 323, 360], 'm-A6-fg': [282, 338, 115, 133], 
   };
   document.querySelectorAll('[data-l]').forEach(el => {
     const b = L[el.dataset.l]; if (!b) return;
@@ -93,6 +93,7 @@
       .to(cam(s5), {scale: 1.55, x: '-20vw', y: '6vh', duration: 80, ease: 'power2.inOut'}, T(860))
       .to(s5, {autoAlpha: 0, duration: 30}, T(905))
       .fromTo(s6, {autoAlpha: 0}, {autoAlpha: 1, duration: 30, immediateRender: false}, T(900))
+      .fromTo('[data-l="A6-fg"]', {x: '-8vw', y: '-6vh', rotate: -8}, {x: 0, y: 0, rotate: 0, duration: 60, ease: 'power2.out', immediateRender: false}, T(910))
       .fromTo(cam(s6), {scale: 1.35, x: '8vw'}, {scale: 1.08, x: 0, duration: 70, ease: 'power2.out', immediateRender: false}, T(900))
     // S6: the camera eases back as the night ends
       .to(cam(s6), {scale: 1, duration: 40, ease: 'power2.inOut'}, T(1020));
