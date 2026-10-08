@@ -93,9 +93,9 @@
       .to(cam(s5), {scale: 1.55, x: '-20vw', y: '6vh', duration: 80, ease: 'power2.inOut'}, T(860))
       .to(s5, {autoAlpha: 0, duration: 30}, T(905))
       .fromTo(s6, {autoAlpha: 0}, {autoAlpha: 1, duration: 30, immediateRender: false}, T(900))
-      .fromTo(cam(s6), {scale: 2.1}, {scale: 1.7, duration: 60, ease: 'power2.out', immediateRender: false}, T(900))
+      .fromTo(cam(s6), {scale: 1.35, x: '8vw'}, {scale: 1.08, x: 0, duration: 70, ease: 'power2.out', immediateRender: false}, T(900))
     // S6: the camera eases back as the night ends
-      .to(cam(s6), {scale: 1.5, duration: 40, ease: 'power2.inOut'}, T(1020));
+      .to(cam(s6), {scale: 1, duration: 40, ease: 'power2.inOut'}, T(1020));
   }
 
   /* ---------- per-position updates: reveals, nav state, lazy embeds ---------- */
