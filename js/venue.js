@@ -13,8 +13,8 @@
     'A1-fg': [1181, 338, 135, 156], 'A2-hero-still': [820, 107, 740, 579], 'A2-fg': [84, 635, 1245, 445],
     'A3-fg': [965, 118, 132, 147], 'A3-board': [600, 345, 490, 335],
     'A4-fg': [1111, 281, 603, 599], 'A4-ffh': [225, 330, 440, 290], 'A4-lit': [552, 440, 478, 320],
-    'A5-card': [752, 396, 356, 272], 'A6-fg': [1184, 499, 170, 196], 'A5-flyer': [352, 268, 272, 382],
-    'm-A1-fg': [581, 180, 113, 130], 'm-A2-fg': [0, 480, 554, 280], 'm-A3-fg': [342, 41, 96, 104], 'm-A4-fg': [457, 161, 323, 360], 'm-A6-fg': [282, 338, 115, 133], 
+    'A5-card': [752, 396, 356, 272], 'A5-flyer': [352, 268, 272, 382],
+    'm-A1-fg': [581, 180, 113, 130], 'm-A2-fg': [0, 480, 554, 280], 'm-A3-fg': [342, 41, 96, 104], 'm-A4-fg': [457, 161, 323, 360], 
   };
   document.querySelectorAll('[data-l]').forEach(el => {
     const b = L[el.dataset.l]; if (!b) return;
@@ -45,7 +45,7 @@
   document.getElementById('venue').style.setProperty('--extra', E + 'vh'); // desktop only: the phone stack sets its own height
   const SETTLED = {home: 0, videos: 220, tour: T(420), music: T(630), contact: T(795), list: T(965)}; // where each scene's content is in place
   const RANGES = [['home', 0], ['videos', 160], ['tour', T(400)], ['music', T(580)], ['contact', T(780)], ['list', T(890)]];
-  const REVEALS = [['#s-tour .rv', T(415)], ['#s-music .card-title', T(590)], ['#s-music .spot-card', T(630)], ['#s-contact .rv', T(790)], ['#s-list .rv', T(950)]];
+  const REVEALS = [['#s-tour .rv', T(415)], ['#s-music .card-title', T(590)], ['#s-music .spot-card', T(600)], ['#s-contact .rv', T(790)], ['#s-list .rv', T(950)]];
   let pos = 0, tl;
   const $ = s => document.querySelector(s);
   if (!still) {
@@ -70,7 +70,7 @@
       .fromTo('#s-videos .vwall', {y: '22vh', rotate: REEL ? 0 : -2.5, autoAlpha: 0}, {y: 0, rotate: 0, autoAlpha: 1, duration: 40, ease: 'power3.out'}, 180);
     if (REEL) { // the reel runs right to left while you keep scrolling, then the camera moves on
       const track = $('[data-vtrack]'), dist = () => -(track.scrollWidth - innerWidth * .84);
-      tl.fromTo(track, {x: '30vw'}, {x: dist, duration: 40 + E, ease: 'none', immediateRender: false}, 205);
+      tl.fromTo(track, {x: 0}, {x: dist, duration: 60 + E, ease: 'none', immediateRender: false}, 200);
     }
     tl
     // 2→3 pan right along the stage
@@ -78,14 +78,14 @@
       .to(s2, {autoAlpha: 0, duration: 24}, T(376))
       .fromTo(s3, {autoAlpha: 0, x: '35vw'}, {autoAlpha: 1, x: 0, duration: 80, ease: 'power1.inOut', immediateRender: false}, T(320))
     // S3 Tour: the board settles, the bird hops
-      .fromTo(cam(s3), {scale: 1.04}, {scale: 1, duration: 100, immediateRender: false}, T(400))
+      .fromTo(cam(s3), {scale: 1.04}, {scale: 1, duration: 180}, T(320))
       .to('[data-l="A3-fg"]', {keyframes: [{y: -10, x: '-.5vw'}, {y: 0, x: '-1vw'}], duration: 100}, T(400))
     // 3→4 tilt down to the merch table
       .to(s3, {y: '-40vh', autoAlpha: 0, duration: 80, ease: 'power2.inOut'}, T(500))
       .fromTo(s4, {autoAlpha: 0, y: '40vh'}, {autoAlpha: 1, y: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(500))
       .fromTo(cam(s4), {scale: 1.08}, {scale: 1, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(500))
     // S4 Music: pick up the record
-      .fromTo('[data-l="A4-fg"]', {x: '-14vw', y: '16vh', rotate: -2, scale: .72}, {x: 0, y: 0, rotate: -7, scale: 1, duration: 50, ease: 'power2.out', immediateRender: false}, T(580))
+      .fromTo('[data-l="A4-fg"]', {x: '-14vw', y: '16vh', rotate: -2, scale: .72}, {x: 0, y: 0, rotate: -7, scale: 1, duration: 60, ease: 'power2.out'}, T(560))
     // 4→5 walk out: the camera turns
       .to(s4, {x: '30vw', autoAlpha: 0, duration: 80, ease: 'power2.inOut'}, T(700))
       .fromTo(s5, {autoAlpha: 0, x: '-30vw'}, {autoAlpha: 1, x: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(700))
@@ -93,7 +93,6 @@
       .to(cam(s5), {scale: 1.55, x: '-20vw', y: '6vh', duration: 80, ease: 'power2.inOut'}, T(860))
       .to(s5, {autoAlpha: 0, duration: 30}, T(905))
       .fromTo(s6, {autoAlpha: 0}, {autoAlpha: 1, duration: 30, immediateRender: false}, T(900))
-      .fromTo('[data-l="A6-fg"]', {x: '-8vw', y: '-6vh', rotate: -8}, {x: 0, y: 0, rotate: 0, duration: 60, ease: 'power2.out', immediateRender: false}, T(910))
       .fromTo(cam(s6), {scale: 1.35, x: '8vw'}, {scale: 1.08, x: 0, duration: 70, ease: 'power2.out', immediateRender: false}, T(900))
     // S6: the camera eases back as the night ends
       .to(cam(s6), {scale: 1, duration: 40, ease: 'power2.inOut'}, T(1020));
@@ -112,7 +111,6 @@
   function onPos(){
     if (!still && isDesk()) {
       REVEALS.forEach(([sel, at]) => document.querySelectorAll(sel).forEach(el => el.classList.toggle('in', pos >= at)));
-      $('.back-start').classList.toggle('on', pos >= T(1025));
       if (pos > T(360)) stopMain('[data-player]'); // pause a playing video once Videos leaves the frame
       if (pos > T(550)) loadSpotify();
     }
