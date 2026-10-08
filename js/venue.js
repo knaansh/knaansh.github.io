@@ -33,23 +33,25 @@
       plate.style.transform = `translate(${(W - 1920 * s) / 2}px,${(H - 1080 * s) / 2}px) scale(${s})`;
       plate.style.setProperty('--s', s);
       sc.querySelector('.cam').style.transformOrigin = sc.dataset.origin;
+      const hero = sc.querySelector('.hero-type'); // the title sits in the art, where the sky begins
+      if (hero) Object.assign(hero.style, {left: (W - 1920 * s) / 2 + 480 * s + 'px', top: (H - 1080 * s) / 2 + 138 * s + 'px'});
     });
   }
   fit(); addEventListener('resize', fit);
 
   /* ---------- the night: one scrubbed timeline ---------- */
   const REEL = root.classList.contains('vid-reel'); // Videos as a scroll-driven film reel (adds scroll length after the stage)
-  const E = REEL ? 160 : 0, T = x => x >= 320 ? x + E : x, TOTAL = 940 + E;
-  if (REEL) document.getElementById('venue').style.height = (1040 + E) + 'vh';
-  const SETTLED = {home: 0, videos: 220, tour: T(420), music: T(630), contact: T(795)}; // where each scene's content is in place
-  const RANGES = [['home', 0], ['videos', 160], ['tour', T(400)], ['music', T(580)], ['contact', T(780)]];
-  const REVEALS = [['#s-tour .rv', T(415)], ['#s-music .card-title', T(590)], ['#s-music .spot-card', T(630)], ['#s-contact .rv', T(790)]];
+  const E = REEL ? 160 : 0, T = x => x >= 320 ? x + E : x, TOTAL = 1060 + E;
+  document.getElementById('venue').style.setProperty('--extra', E + 'vh'); // desktop only: the phone stack sets its own height
+  const SETTLED = {home: 0, videos: 220, tour: T(420), music: T(630), contact: T(795), list: T(965)}; // where each scene's content is in place
+  const RANGES = [['home', 0], ['videos', 160], ['tour', T(400)], ['music', T(580)], ['contact', T(780)], ['list', T(890)]];
+  const REVEALS = [['#s-tour .rv', T(415)], ['#s-music .card-title', T(590)], ['#s-music .spot-card', T(630)], ['#s-contact .rv', T(790)], ['#s-list .rv', T(950)]];
   let pos = 0, tl;
   const $ = s => document.querySelector(s);
   if (!still) {
     gsap.registerPlugin(ScrollTrigger);
-    const [s1, s2, s3, s4, s5] = scenes, cam = s => s.querySelector('.cam');
-    gsap.set([s2, s3, s4, s5], {autoAlpha: 0});
+    const [s1, s2, s3, s4, s5, s6] = scenes, cam = s => s.querySelector('.cam');
+    gsap.set([s2, s3, s4, s5, s6], {autoAlpha: 0});
     tl = gsap.timeline({defaults: {ease: 'none'}, scrollTrigger: {trigger: '#venue', start: 'top top', end: 'bottom bottom', scrub: .6,
       onUpdate: self => { pos = self.progress * TOTAL; onPos(); }}});
     tl.set({}, {}, TOTAL); // pin the length
@@ -87,8 +89,13 @@
     // 4→5 walk out: the camera turns
       .to(s4, {x: '30vw', autoAlpha: 0, duration: 80, ease: 'power2.inOut'}, T(700))
       .fromTo(s5, {autoAlpha: 0, x: '-30vw'}, {autoAlpha: 1, x: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(700))
-    // S5 Contact: the camera pulls back
-      .to(cam(s5), {scale: .86, duration: 40, ease: 'power2.inOut'}, T(900));
+    // 5→6 step out into the street under the stars: the mailing list
+      .to(cam(s5), {scale: 1.55, x: '-20vw', y: '6vh', duration: 80, ease: 'power2.inOut'}, T(860))
+      .to(s5, {autoAlpha: 0, duration: 30}, T(905))
+      .fromTo(s6, {autoAlpha: 0}, {autoAlpha: 1, duration: 30, immediateRender: false}, T(900))
+      .fromTo(cam(s6), {scale: 2.1}, {scale: 1.7, duration: 60, ease: 'power2.out', immediateRender: false}, T(900))
+    // S6: the camera eases back as the night ends
+      .to(cam(s6), {scale: 1.5, duration: 40, ease: 'power2.inOut'}, T(1020));
   }
 
   /* ---------- per-position updates: reveals, nav state, lazy embeds ---------- */
@@ -104,7 +111,7 @@
   function onPos(){
     if (!still && isDesk()) {
       REVEALS.forEach(([sel, at]) => document.querySelectorAll(sel).forEach(el => el.classList.toggle('in', pos >= at)));
-      $('.back-start').classList.toggle('on', pos >= T(905));
+      $('.back-start').classList.toggle('on', pos >= T(1025));
       if (pos > T(360)) stopMain('[data-player]'); // pause a playing video once Videos leaves the frame
       if (pos > T(550)) loadSpotify();
     }
@@ -222,6 +229,25 @@
     const r = e.target.closest('[data-rec]'); if (r) return openRecord(r.dataset.rec);
     if (e.target.closest('[data-close]') || e.target === pop) closePop();
   });
+
+  /* ---------- mailing list: Mailchimp, sent in the background so visitors stay on the page ---------- */
+  const MC_URL = ''; // Mailchimp › Audience › Signup forms › Embedded form › the form's action="…list-manage.com/subscribe/post?u=…&id=…"
+  document.querySelectorAll('[data-mc]').forEach(f => f.addEventListener('submit', e => {
+    e.preventDefault();
+    const input = f.querySelector('input[type=email]'), msg = f.querySelector('.mc-msg'), email = input.value.trim();
+    const say = (t, cls) => { msg.textContent = t; msg.className = 'mc-msg ' + (cls || ''); };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return say('That email doesn\u2019t look right.', 'err');
+    if (!MC_URL || !EMBEDS) return say('Sign-ups open soon. Thanks for your patience!', 'err');
+    const cb = 'mc' + Date.now(), s = document.createElement('script');
+    const done = () => { delete window[cb]; s.remove(); f.querySelector('button').disabled = false; };
+    const timer = setTimeout(() => { done(); say('Something went wrong. Please try again.', 'err'); }, 9000);
+    window[cb] = d => { clearTimeout(timer); done();
+      if (d.result === 'success') { say('You\u2019re on the list. Thanks!', 'ok'); input.value = ''; }
+      else say(/already subscribed/i.test(d.msg) ? 'You\u2019re already on the list.' : 'Something went wrong. Please try again.', 'err'); };
+    f.querySelector('button').disabled = true; say('Sending\u2026');
+    s.src = MC_URL.replace('/post?', '/post-json?') + '&EMAIL=' + encodeURIComponent(email) + '&c=' + cb;
+    document.body.appendChild(s);
+  }));
 
   /* ---------- Bandsintown: the visible slot gets the real widget ---------- */
   function loadBIT(){

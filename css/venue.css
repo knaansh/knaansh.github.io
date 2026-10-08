@@ -23,7 +23,7 @@ img{display:block;max-width:100%}
 /* ===== header ===== */
 .top{position:fixed;inset:0 0 auto 0;z-index:50;height:calc(var(--head) + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) clamp(16px,3vw,40px) 0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;background:var(--paper);border-bottom:1px solid var(--line)}
 .top .mark img{height:24px;width:auto;filter:invert(1)}
-.top .links{display:flex;gap:clamp(1rem,2.4vw,2rem);font:500 10px/1 var(--sans);letter-spacing:.22em;text-transform:uppercase}
+.top .links{display:flex;gap:clamp(1.2rem,2.6vw,2.4rem);font:500 12px/1 var(--sans);letter-spacing:.22em;text-transform:uppercase}
 .top .links a{opacity:.62;padding:.45rem 0;position:relative}
 .top .links a:hover,.top .links a[aria-current="true"]{opacity:1}
 .top .links a[aria-current="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:1.5px;background:var(--sky)}
@@ -57,7 +57,7 @@ img{display:block;max-width:100%}
 #site-menu .socials svg{width:20px;height:20px}
 
 /* ===== the venue (desktop engine) ===== */
-.venue{position:relative;height:1040vh} /* 940vh of scroll + one screen */
+.venue{position:relative;height:calc(1160vh + var(--extra,0vh))} /* 1060vh of scroll + one screen; the Videos reel adds more in JS */
 .stage{position:sticky;top:0;height:100vh;overflow:hidden;background:var(--paper)}
 .scene{position:absolute;left:0;right:0;top:var(--head);bottom:0;overflow:hidden;will-change:transform,opacity}
 .cam{position:absolute;inset:0;will-change:transform}
@@ -74,10 +74,10 @@ img{display:block;max-width:100%}
 .card-title .h1{font-size:clamp(1.8rem,2.6vw,2.6rem);margin-top:6px}
 .card-title .small{font:italic 400 1rem/1.2 var(--serif);color:var(--muted);margin-top:6px}
 .hero-type{position:absolute;z-index:6;left:clamp(32px,6vw,110px);top:clamp(28px,6vh,70px)}
-.hero-type .name{font:600 clamp(1.6rem,2.4vw,2.3rem)/1 var(--sans);letter-spacing:.2em;text-transform:uppercase}
+.hero-type .name{font:600 clamp(1.4rem,2.1vw,2.1rem)/1 var(--sans);letter-spacing:.2em;text-transform:uppercase}
 .album{font:500 11px/1.4 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:#5a554d;margin-top:14px}
 .album .listen{font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--sky);background:none;border:0;padding:0 0 2px;border-bottom:1px solid currentColor;cursor:pointer}
-.hero-type h1{font:italic 400 clamp(1.4rem,2vw,1.9rem)/1.2 var(--serif);color:#3f3b35;margin-top:8px}
+.hero-type h1{font:italic 400 clamp(1.25rem,1.75vw,1.75rem)/1.2 var(--serif);color:#3f3b35;margin-top:8px}
 .cue{position:absolute;z-index:6;left:50%;bottom:22px;transform:translateX(-50%);font:500 10px/1 var(--mono);letter-spacing:.24em;text-transform:uppercase}
 .rail{position:fixed;z-index:20;right:18px;top:50%;transform:translateY(-50%);display:grid;gap:18px;justify-items:end}
 .rail a{display:flex;align-items:center;gap:8px;font:500 9px/1 var(--mono);letter-spacing:.14em;color:var(--muted)}
@@ -310,3 +310,25 @@ img{display:block;max-width:100%}
 .cnav a{margin-left:10px;color:#fbf9f4;font:500 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;border-bottom:1px solid rgba(251,249,244,.5);padding-bottom:3px}
 .pop.cinema .x{background:transparent;color:#fbf9f4;border-color:rgba(251,249,244,.4)}
 @media (max-width:900px){ .pop.cinema .cbar{flex-direction:column;align-items:flex-start} }
+
+/* the mailing list: a paper card under the stars */
+.signup{position:absolute;z-index:6;left:clamp(24px,6vw,110px);top:18vh;width:min(520px,40vw);background:var(--card);padding:clamp(24px,3vw,40px);box-shadow:0 1px 0 var(--line),0 24px 50px -24px rgba(0,0,0,.45)}
+.mc .h1{font-size:clamp(1.8rem,2.6vw,2.6rem)}
+.mc-lede{font:italic 400 1.15rem/1.35 var(--serif);color:#4a463f;margin:10px 0 18px}
+.mc-row{display:flex;gap:8px}
+.mc-row input{flex:1;min-width:0;border:1.5px solid var(--ink);background:#fff;padding:12px 14px;font:400 1rem/1.2 var(--sans);color:var(--ink);border-radius:0}
+.mc-row input:focus{outline:2px solid var(--sky);outline-offset:1px}
+.mc-row button{background:var(--ink);color:var(--paper);padding:0 18px;font:500 11px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;white-space:nowrap}
+.mc-row button:hover{background:var(--sky)}
+.mc-row button:disabled{opacity:.6}
+.mc-msg{min-height:1.4em;margin-top:10px;font-size:.92rem;color:var(--muted)}
+.mc-msg.ok{color:var(--sky)}.mc-msg.err{color:#a3402c}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:900px){
+  .mcon .mc-row{flex-direction:column}
+  .mcon .mc-row button{padding:15px}
+  #list .mcon{padding-top:8px}
+  #list .mfoot{margin-top:28px}
+}
+.hero-type .album{display:inline-block;background:rgba(251,249,244,.88);padding:6px 9px;margin-top:10px}
+#s-list .foot{background:rgba(251,249,244,.9);padding:10px 16px 8px}
