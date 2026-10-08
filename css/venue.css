@@ -3,6 +3,7 @@
    Phone (≤900px): a plain vertical stack, art on top, live content full width underneath.
    Reduced motion: no pinning, every scene shown at rest. Spec: Drive › storyboard › MOTION-SPEC.md, LAYERS-ASSETS.md */
 *{box-sizing:border-box;margin:0;padding:0}
+html:root{padding:0!important}
 :root{
   --paper:#fbf9f4; --paper-2:#f1ede4; --card:#fdfcf8; --ink:#141414; --muted:#857f75; --line:rgba(20,20,20,.12); --sky:#4f7ea6;
   --sans:'Inter',system-ui,sans-serif; --serif:'Instrument Serif',Georgia,serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
