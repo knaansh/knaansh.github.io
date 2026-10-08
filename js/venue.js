@@ -131,6 +131,8 @@
     history.replaceState(null, '', id === 'home' ? location.pathname : '#' + id);
   }
   navLinks.forEach(a => a.addEventListener('click', e => { e.preventDefault(); const id = a.dataset.go; if (menu.classList.contains('open')) { setMenu(false); setTimeout(() => go(id), 280); } else go(id); }));
+  // desktop: unpack every scene image once the page has loaded, so no scene waits on a big image when it comes into view
+  addEventListener('load', () => { if (isDesk()) document.querySelectorAll('.stage img').forEach(im => im.decode && im.decode().catch(() => {})); });
   addEventListener('load', () => { const h = location.hash.slice(1); if (SETTLED[h] !== undefined && h !== 'home') setTimeout(() => go(h), 60); onPos(); });
 
   /* ---------- phone menu: drop-down paper sheet with scroll lock and focus trap ---------- */
