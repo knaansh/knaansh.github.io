@@ -277,10 +277,3 @@ img{display:block;max-width:100%}
 }
 @media (max-width:900px){ html.full #home.msec{flex-direction:row;min-height:0} }
 
-/* the travelling bird */
-.mark{position:absolute;display:block;aspect-ratio:270/312;pointer-events:none}
-.flybird{position:fixed;left:0;top:0;z-index:45;pointer-events:none;will-change:transform;opacity:0}
-.flybird img{display:block;width:100%;height:auto;transform-origin:50% 60%}
-.flybird.flying img{animation:flap .22s ease-in-out infinite alternate}
-@keyframes flap{from{transform:rotate(-7deg) scaleY(1)}to{transform:rotate(5deg) scaleY(.88)}}
-.has-flybird [data-l="A1-fg"],.has-flybird [data-l="A3-fg"],.has-flybird [data-l="m-A1-fg"],.has-flybird [data-l="m-A3-fg"]{visibility:hidden}
