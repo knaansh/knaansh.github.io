@@ -8,7 +8,6 @@ html:root{padding:0!important}
   --paper:#fbf9f4; --paper-2:#f1ede4; --card:#fdfcf8; --ink:#141414; --muted:#857f75; --line:rgba(20,20,20,.12); --sky:#4f7ea6;
   --sans:'Inter',system-ui,sans-serif; --serif:'Instrument Serif',Georgia,serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
   --head:64px;
-  --tear-t:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='12' viewBox='0 0 140 12'><path d='M0 12H140V6L134 3L127 7L119 2L111 6L104 1L96 5L88 3L81 8L73 2L66 6L58 3L51 7L43 2L36 6L28 1L21 5L13 3L6 7L0 4Z' fill='black'/></svg>");
   --tear-b:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='12' viewBox='0 0 140 12'><path d='M0 0H140V6L134 9L127 5L119 10L111 6L104 11L96 7L88 9L81 4L73 10L66 6L58 9L51 5L43 10L36 6L28 11L21 7L13 9L6 5L0 8Z' fill='black'/></svg>");
 }
 html{background:var(--paper)}
@@ -249,43 +248,16 @@ img{display:block;max-width:100%}
   #home .mcon{flex:1;align-content:center;padding-bottom:48px}
 }
 
-/* ===== phone, full-screen version (full.html): the scene fills the screen, content cards scroll over it ===== */
-@media (max-width:900px){
-  html.full .venue{padding-top:0}
-  html.full .fsbg{position:fixed;left:0;right:0;top:calc(var(--head) + env(safe-area-inset-top,0px));bottom:0;z-index:0;overflow:hidden;background:var(--paper)}
-  .fsart{position:absolute;inset:0;will-change:transform,opacity}
-  .fsplate{position:absolute;left:0;top:0;width:780px;transform-origin:0 0}
-  .fsplate > img:first-child{display:block;width:100%;height:auto}
-  .fsplate .fl{position:absolute}
-  .glow{position:absolute;inset:0;opacity:0;pointer-events:none;background:radial-gradient(circle at var(--gx,85%) var(--gy,60%),#ffe2ad 0,#fbf3e3 38%,var(--paper) 75%)}
-  html.full .fsflow{position:relative;z-index:1;padding-top:calc(var(--head) + env(safe-area-inset-top,0px))}
-  .fsgap{height:88svh;pointer-events:none}
-  .fsgap.hero{height:calc(100svh - var(--head));display:flex;align-items:flex-end;pointer-events:none}
-  .herotext{width:100%;padding:56px 20px 34px;display:grid;gap:12px;pointer-events:auto;
-    background:linear-gradient(to top,rgba(251,249,244,.97) 58%,rgba(251,249,244,0))}
-  .herotext .name{font:600 24px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase}
-  .herotext .sub{font:italic 400 1.5rem/1.2 var(--serif);color:#3f3b35}
-  .herotext .album{margin-top:0}
-  .sheet{position:relative;margin:0 12px;padding:30px 18px 30px;display:grid;gap:12px;background:var(--paper);
-    box-shadow:0 1px 2px rgba(0,0,0,.08),0 24px 40px -24px rgba(0,0,0,.4);
-    -webkit-mask:linear-gradient(#000 0 0) bottom/100% calc(100% - 12px) no-repeat,var(--tear-t) top/140px 12px repeat-x;
-    mask:linear-gradient(#000 0 0) bottom/100% calc(100% - 12px) no-repeat,var(--tear-t) top/140px 12px repeat-x}
-  .sheet .h1{font-size:38px}
-  .sheet .bitbox{border:1px solid var(--line);background:var(--card);padding:14px;font-size:16px}
-  .sheet .spot-slot iframe{width:100%;height:152px;border:0;border-radius:12px}
-  #contact.sheet{margin-bottom:0}
-}
-@media (max-width:900px){ html.full #home.msec{flex-direction:row;min-height:0} }
 
 /* phone spacing: 24px from each image to its title, 16px from the title to what follows; hero text sits right under its image */
 @media (max-width:900px){
   .mcon{padding-top:24px}
-  .mcon .h1,.sheet .h1{margin-bottom:4px} /* 12px grid gap + 4px = 16px */
+  .mcon .h1{margin-bottom:4px} /* 12px grid gap + 4px = 16px */
   #home .mcon{align-content:start;padding-top:24px}
 }
 @media (max-width:900px){
   .mcon{padding-bottom:40px} /* 40px from one section's content to the next section's image */
-  .mcon .h1,.sheet .h1{margin-bottom:12px} /* 12px grid gap + 12px = 24px */
+  .mcon .h1{margin-bottom:12px} /* 12px grid gap + 12px = 24px */
 }
 @media (max-width:900px){
   #contact .mail{margin-bottom:12px}  /* 24px email to button */

@@ -112,7 +112,7 @@
   function go(id, smooth = true){
     let y;
     if (isDesk() && !still) y = SETTLED[id] / 940 * (document.getElementById('venue').offsetHeight - innerHeight);
-    else { const el = isDesk() ? document.getElementById('s-' + id) : document.getElementById(id); if (!el) return; y = el.getBoundingClientRect().top + scrollY - (isDesk() ? 0 : root.classList.contains('full') && id !== 'home' ? innerHeight * .42 : 64); }
+    else { const el = isDesk() ? document.getElementById('s-' + id) : document.getElementById(id); if (!el) return; y = el.getBoundingClientRect().top + scrollY - (isDesk() ? 0 : 64); }
     scrollTo({top: Math.max(0, y), behavior: smooth && !reduce ? 'smooth' : 'auto'});
     history.replaceState(null, '', id === 'home' ? location.pathname : '#' + id);
   }
