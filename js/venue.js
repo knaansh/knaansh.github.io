@@ -51,8 +51,18 @@
   if (!still) {
     gsap.registerPlugin(ScrollTrigger);
     const [s1, s2, s3, s4, s5, s6] = scenes, cam = s => s.querySelector('.cam');
-    gsap.set([s2, s3, s4, s5, s6], {autoAlpha: 0});
-    tl = gsap.timeline({defaults: {ease: 'none'}, scrollTrigger: {trigger: '#venue', start: 'top top', end: 'bottom bottom', scrub: .6,
+    // Which scene is showing is worked out from the playhead on every frame, never left to tween memory:
+    // GSAP rewinds a tween to whatever it saw before its first run, and after a jump (nav click, fast flick)
+    // that could be "hidden", leaving a blank screen. [start, length, from, to, ease] per fade, in order.
+    const FADES = [[s1, 1, [[136, 24, 1, 0]]], [s2, 0, [[100, 0, 0, 1], [T(376), 24, 1, 0]]],
+      [s3, 0, [[T(320), 80, 0, 1, 'power1.inOut'], [T(500), 80, 1, 0, 'power2.inOut']]],
+      [s4, 0, [[T(500), 80, 0, 1, 'power2.inOut'], [T(700), 80, 1, 0, 'power2.inOut']]],
+      [s5, 0, [[T(700), 80, 0, 1, 'power2.inOut'], [T(905), 30, 1, 0]]], [s6, 0, [[T(900), 30, 0, 1]]],
+      [$('#s-videos .vwall'), 0, [[180, 40, 0, 1, 'power3.out']]]];
+    const fades = () => { const t = tl.time(); FADES.forEach(([el, v0, segs]) => { let v = v0;
+      for (const [at, len, a, b, ease] of segs) { if (t >= at + len) v = b; else { if (t > at) v = a + (b - a) * gsap.parseEase(ease || 'none')((t - at) / len); break; } }
+      el.style.opacity = v; el.style.visibility = v > 0 ? '' : 'hidden'; }); };
+    tl = gsap.timeline({defaults: {ease: 'none'}, onUpdate: fades, scrollTrigger: {trigger: '#venue', start: 'top top', end: 'bottom bottom', scrub: .6,
       onUpdate: self => { pos = self.progress * TOTAL; onPos(); }}});
     tl.set({}, {}, TOTAL); // pin the length
     // S1 Outside: dolly toward the door; the bird flies to it; the title lifts away
@@ -61,14 +71,13 @@
       .to('#s-home .hero-type', {autoAlpha: 0, y: -40, duration: 40}, 0)
     // 1→2 through the door: keep zooming in, the stage is revealed from the doorway
       .fromTo(cam(s1), {scale: 1.18}, {scale: 2.4, duration: 60, ease: 'power2.inOut', immediateRender: false}, 100)
-      .fromTo(s1, {autoAlpha: 1}, {autoAlpha: 0, duration: 24, immediateRender: false}, 136)
-      .fromTo(s2, {autoAlpha: 1, clipPath: 'inset(44% 30% 40% 62%)'}, {clipPath: 'inset(0% 0% 0% 0%)', duration: 60, ease: 'power2.inOut', immediateRender: false}, 100)
+      .fromTo(s2, {clipPath: 'inset(44% 30% 40% 62%)'}, {clipPath: 'inset(0% 0% 0% 0%)', duration: 60, ease: 'power2.inOut', immediateRender: false}, 100)
       .fromTo(cam(s2), {scale: 1.12}, {scale: 1, duration: 60, ease: 'power2.inOut', immediateRender: false}, 100)
       .set(s2, {clipPath: 'none'}, 160) // drop the doorway clip once it is fully open, so it never sits on top of the reel
     // S2 Inside = Videos: lights come up, the Videos panel rises from behind the stage lip
       .fromTo('#s-videos .ink', {opacity: .45}, {opacity: 0, duration: 30, ease: 'power1.out'}, 160)
       .fromTo(cam(s2), {scale: 1}, {scale: 1.05, duration: 30, immediateRender: false}, 160)
-      .fromTo('#s-videos .vwall', {y: '22vh', rotate: REEL ? 0 : -2.5, autoAlpha: 0}, {y: 0, rotate: 0, autoAlpha: 1, duration: 40, ease: 'power3.out'}, 180);
+      .fromTo('#s-videos .vwall', {y: '22vh', rotate: REEL ? 0 : -2.5}, {y: 0, rotate: 0, duration: 40, ease: 'power3.out'}, 180);
     if (REEL) { // the reel runs right to left while you keep scrolling, then the camera moves on
       const track = $('[data-vtrack]'), dist = () => -(track.scrollWidth - innerWidth * .84);
       // slide each polaroid instead of the whole strip: one ~6000px-wide moving layer is what Safari drops and leaves blank
@@ -78,27 +87,25 @@
     // 2→3 pan right along the stage (every scene hand-off states both ends: a .to here would remember whatever
     // half-finished state it first saw during a fast scroll or nav jump, and later replay it as a blank screen)
       .fromTo(s2, {x: 0}, {x: '-35vw', duration: 80, ease: 'power1.inOut', immediateRender: false}, T(320))
-      .fromTo(s2, {autoAlpha: 1}, {autoAlpha: 0, duration: 24, immediateRender: false}, T(376))
-      .fromTo(s3, {autoAlpha: 0, x: '35vw'}, {autoAlpha: 1, x: 0, duration: 80, ease: 'power1.inOut', immediateRender: false}, T(320))
+      .fromTo(s3, {x: '35vw'}, {x: 0, duration: 80, ease: 'power1.inOut', immediateRender: false}, T(320))
     // S3 Tour: the board settles, the bird hops
       .fromTo(cam(s3), {scale: 1.04}, {scale: 1, duration: 180}, T(320))
       .to('[data-l="A3-fg"]', {keyframes: [{y: -10, x: '-.5vw'}, {y: 0, x: '-1vw'}], duration: 100}, T(400))
     // 3→4 tilt down to the merch table
-      .fromTo(s3, {y: 0, autoAlpha: 1}, {y: '-40vh', autoAlpha: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(500))
-      .fromTo(s4, {autoAlpha: 0, y: '40vh'}, {autoAlpha: 1, y: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(500))
+      .fromTo(s3, {y: 0}, {y: '-40vh', duration: 80, ease: 'power2.inOut', immediateRender: false}, T(500))
+      .fromTo(s4, {y: '40vh'}, {y: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(500))
       .fromTo(cam(s4), {scale: 1.08}, {scale: 1, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(500))
     // S4 Music: pick up the record
       .fromTo('[data-l="A4-fg"]', {x: '-14vw', y: '16vh', rotate: -2, scale: .72}, {x: 0, y: 0, rotate: -7, scale: 1, duration: 60, ease: 'power2.out'}, T(560))
     // 4→5 walk out: the camera turns
-      .fromTo(s4, {x: 0, autoAlpha: 1}, {x: '30vw', autoAlpha: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(700))
-      .fromTo(s5, {autoAlpha: 0, x: '-30vw'}, {autoAlpha: 1, x: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(700))
+      .fromTo(s4, {x: 0}, {x: '30vw', duration: 80, ease: 'power2.inOut', immediateRender: false}, T(700))
+      .fromTo(s5, {x: '-30vw'}, {x: 0, duration: 80, ease: 'power2.inOut', immediateRender: false}, T(700))
     // 5→6 step out into the street under the stars: the mailing list
       .fromTo(cam(s5), {scale: 1, x: 0, y: 0}, {scale: 1.55, x: '-20vw', y: '6vh', duration: 80, ease: 'power2.inOut', immediateRender: false}, T(860))
-      .fromTo(s5, {autoAlpha: 1}, {autoAlpha: 0, duration: 30, immediateRender: false}, T(905))
-      .fromTo(s6, {autoAlpha: 0}, {autoAlpha: 1, duration: 30, immediateRender: false}, T(900))
       .fromTo(cam(s6), {scale: 1.35, x: '8vw'}, {scale: 1.08, x: 0, duration: 70, ease: 'power2.out', immediateRender: false}, T(900))
     // S6: the camera eases back as the night ends
       .fromTo(cam(s6), {scale: 1.08}, {scale: 1, duration: 40, ease: 'power2.inOut', immediateRender: false}, T(1020));
+    fades();
   }
 
   /* ---------- per-position updates: reveals, nav state, lazy embeds ---------- */
