@@ -337,3 +337,4 @@ img{display:block;max-width:100%}
 /* Widgets: slightly rounded corners */
 .card-title,.board,.signup,.pop:not(.cinema) .box{border-radius:12px}
 .mc-row input,.mc-row button{border-radius:6px}
+.vid-reel .wcard{translate:var(--rx,0px) 0;will-change:translate}
